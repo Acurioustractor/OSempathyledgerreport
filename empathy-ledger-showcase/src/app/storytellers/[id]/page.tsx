@@ -8,6 +8,12 @@ import { Story, Storyteller, Theme } from '@/types'
 
 async function getStorytellerData(id: string) {
   try {
+    // Validate input
+    if (!id || typeof id !== 'string' || id.trim() === '') {
+      console.error('Invalid storyteller ID provided:', id)
+      return null
+    }
+
     const [storytellersData, storiesData, themesData, analyticsData] = await Promise.all([
       fs.readFile(path.join(process.cwd(), 'public/data/storytellers.json'), 'utf8').then(data => JSON.parse(data)),
       fs.readFile(path.join(process.cwd(), 'public/data/stories.json'), 'utf8').then(data => JSON.parse(data)),
@@ -15,29 +21,39 @@ async function getStorytellerData(id: string) {
       fs.readFile(path.join(process.cwd(), 'public/data/analytics.json'), 'utf8').then(data => JSON.parse(data))
     ])
 
+    // Validate data loaded successfully
+    if (!Array.isArray(storytellersData) || !Array.isArray(storiesData) || !Array.isArray(themesData)) {
+      console.error('Invalid data format loaded from files')
+      return null
+    }
+
     const storyteller = storytellersData.find((st: Storyteller) => st.id === id)
-    if (!storyteller) return null
+    if (!storyteller) {
+      console.error('Storyteller not found for ID:', id)
+      return null
+    }
 
     // Get stories by this storyteller
-    const relatedStories = storiesData.filter((s: Story) => 
-      s.storytellerIds && s.storytellerIds.includes(storyteller.id)
-    )
+    const relatedStories = Array.isArray(storiesData) ? storiesData.filter((s: Story) => 
+      s.storytellerIds && Array.isArray(s.storytellerIds) && s.storytellerIds.includes(storyteller.id)
+    ) : []
 
     // Get themes associated with this storyteller
-    const relatedThemes = themesData.filter((t: Theme) => 
-      storyteller.themeIds?.includes(t.id) || storyteller.themes?.includes(t.name)
-    )
+    const relatedThemes = Array.isArray(themesData) ? themesData.filter((t: Theme) => 
+      (Array.isArray(storyteller.themeIds) && storyteller.themeIds.includes(t.id)) || 
+      (Array.isArray(storyteller.themes) && storyteller.themes.includes(t.name))
+    ) : []
 
     // Get similar storytellers (same role, location, or themes)
-    const similarStorytellers = storytellersData
+    const similarStorytellers = Array.isArray(storytellersData) ? storytellersData
       .filter((st: Storyteller) => 
         st.id !== id && (
-          st.role.toLowerCase() === storyteller.role.toLowerCase() ||
+          (st.role && storyteller.role && st.role.toLowerCase() === storyteller.role.toLowerCase()) ||
           st.location === storyteller.location ||
-          (st.themeIds && storyteller.themeIds && st.themeIds.some(themeId => storyteller.themeIds?.includes(themeId)))
+          (Array.isArray(st.themeIds) && Array.isArray(storyteller.themeIds) && st.themeIds.some(themeId => storyteller.themeIds?.includes(themeId)))
         )
       )
-      .slice(0, 4)
+      .slice(0, 4) : []
 
     // Get theme distribution for this storyteller's role
     const roleAnalytics = analyticsData?.storytellers?.byRole || {}
@@ -55,21 +71,33 @@ async function getStorytellerData(id: string) {
     }
   } catch (error) {
     console.error('Error loading storyteller data:', error)
+    console.error('Error details:', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      storytellerId: id
+    })
     return null
   }
 }
 
 export default async function StorytellerProfilePage({ params }: { params: { id: string } }) {
-  const data = await getStorytellerData(params.id)
-  
-  if (!data) {
-    notFound()
-  }
+  try {
+    // Validate params
+    if (!params || !params.id) {
+      console.error('Missing params or params.id')
+      notFound()
+    }
+    
+    const data = await getStorytellerData(params.id)
+    
+    if (!data) {
+      notFound()
+    }
 
   const { storyteller, relatedStories, relatedThemes, similarStorytellers, roleAnalytics, locationAnalytics, storiesData } = data
 
   // Find location stats
-  const locationStats = locationAnalytics.find((loc: any) => loc.location === storyteller.location)
+  const locationStats = Array.isArray(locationAnalytics) ? locationAnalytics.find((loc: any) => loc.location === storyteller.location) : null
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -108,7 +136,7 @@ export default async function StorytellerProfilePage({ params }: { params: { id:
                   ) : (
                     <div className="w-32 h-32 mx-auto rounded-full bg-orange-100 flex items-center justify-center">
                       <span className="text-3xl font-semibold text-orange-sky">
-                        {storyteller.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
+                        {storyteller.name ? storyteller.name.split(' ').map(n => n[0] || '').join('').toUpperCase().slice(0, 2) : 'ST'}
                       </span>
                     </div>
                   )}
@@ -217,12 +245,12 @@ export default async function StorytellerProfilePage({ params }: { params: { id:
                             <div className="flex items-center gap-4 text-sm text-gray-600">
                               <div className="flex items-center gap-1">
                                 <Calendar className="w-4 h-4" />
-                                <time dateTime={story.createdAt}>
-                                  {new Date(story.createdAt).toLocaleDateString('en-AU', {
+                                <time dateTime={story.createdAt || ''}>
+                                  {story.createdAt ? new Date(story.createdAt).toLocaleDateString('en-AU', {
                                     year: 'numeric',
                                     month: 'short',
                                     day: 'numeric'
-                                  })}
+                                  }) : 'Date unknown'}
                                 </time>
                               </div>
                               
@@ -239,7 +267,7 @@ export default async function StorytellerProfilePage({ params }: { params: { id:
                             <div className="relative w-20 h-20 rounded-lg overflow-hidden ml-4 flex-shrink-0">
                               <Image
                                 src={story.profileImage}
-                                alt={story.title}
+                                alt={story.title || 'Story'}
                                 fill
                                 className="object-cover"
                                 sizes="80px"
@@ -267,7 +295,7 @@ export default async function StorytellerProfilePage({ params }: { params: { id:
                   </h2>
                   
                   {/* Check if quotes are actual text (strings) or just IDs */}
-                  {typeof storyteller.quotes[0] === 'string' && storyteller.quotes[0].length > 10 ? (
+                  {storyteller.quotes && storyteller.quotes.length > 0 && typeof storyteller.quotes[0] === 'string' && storyteller.quotes[0].length > 10 ? (
                     <div className="space-y-6">
                       {storyteller.quotes.slice(0, 3).map((quote: string, index: number) => (
                         <div key={index} className="border-l-4 border-orange-sky pl-6 py-4">
@@ -290,10 +318,10 @@ export default async function StorytellerProfilePage({ params }: { params: { id:
                     <div className="text-center py-8">
                       <Quote className="w-12 h-12 text-orange-sky mx-auto mb-4" />
                       <p className="text-lg text-gray-700 mb-4">
-                        {storyteller.name.split(' ')[0]} has shared <span className="font-semibold text-orange-sky">{storyteller.quotes.length}</span> meaningful insights through conversations with Orange Sky.
+                        {storyteller.name ? storyteller.name.split(' ')[0] : 'This storyteller'} has shared <span className="font-semibold text-orange-sky">{storyteller.quotes ? storyteller.quotes.length : 0}</span> meaningful insights through conversations with Orange Sky.
                       </p>
                       <p className="text-gray-600">
-                        These conversations capture authentic perspectives on {storyteller.role.toLowerCase().includes('volunteer') ? 'volunteering, community service, and the impact of giving back' : storyteller.role.toLowerCase().includes('friend') ? 'lived experience, resilience, and the value of human connection' : 'providing services, community support, and making a difference'}.
+                        These conversations capture authentic perspectives on {storyteller.role && storyteller.role.toLowerCase().includes('volunteer') ? 'volunteering, community service, and the impact of giving back' : storyteller.role && storyteller.role.toLowerCase().includes('friend') ? 'lived experience, resilience, and the value of human connection' : 'providing services, community support, and making a difference'}.
                       </p>
                       
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
@@ -365,9 +393,9 @@ export default async function StorytellerProfilePage({ params }: { params: { id:
                     {storyteller.role === 'volunteer' ? 'Volunteer' : 'Friend'} Contribution
                   </h3>
                   <p className="text-sm text-gray-700 leading-relaxed">
-                    {storyteller.role.toLowerCase().includes('volunteer') 
-                      ? `As a volunteer, ${storyteller.name.split(' ')[0]} contributes to Orange Sky's mission by providing laundry services and genuine conversations. Their stories help us understand the volunteer experience and the meaningful connections formed through service.`
-                      : `As a friend of Orange Sky, ${storyteller.name.split(' ')[0]} shares their lived experience and perspective. Their stories provide valuable insights into the real-world impact of Orange Sky's services and the importance of dignity, respect, and human connection.`
+                    {storyteller.role && storyteller.role.toLowerCase().includes('volunteer') 
+                      ? `As a volunteer, ${storyteller.name ? storyteller.name.split(' ')[0] : 'this storyteller'} contributes to Orange Sky's mission by providing laundry services and genuine conversations. Their stories help us understand the volunteer experience and the meaningful connections formed through service.`
+                      : `As a friend of Orange Sky, ${storyteller.name ? storyteller.name.split(' ')[0] : 'this storyteller'} shares their lived experience and perspective. Their stories provide valuable insights into the real-world impact of Orange Sky's services and the importance of dignity, respect, and human connection.`
                     }
                   </p>
                 </div>
@@ -392,19 +420,19 @@ export default async function StorytellerProfilePage({ params }: { params: { id:
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
                   <span className="text-gray-700">Volunteers</span>
-                  <span className={`font-bold ${storyteller.role.toLowerCase().includes('volunteer') ? 'text-orange-sky' : 'text-gray-900'}`}>
+                  <span className={`font-bold ${storyteller.role && storyteller.role.toLowerCase().includes('volunteer') ? 'text-orange-sky' : 'text-gray-900'}`}>
                     {roleAnalytics.volunteers || 0}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-700">Friends</span>
-                  <span className={`font-bold ${storyteller.role.toLowerCase().includes('friend') ? 'text-orange-sky' : 'text-gray-900'}`}>
+                  <span className={`font-bold ${storyteller.role && storyteller.role.toLowerCase().includes('friend') ? 'text-orange-sky' : 'text-gray-900'}`}>
                     {roleAnalytics.friends || 0}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-700">Service Providers</span>
-                  <span className={`font-bold ${storyteller.role.toLowerCase().includes('service provider') ? 'text-orange-sky' : 'text-gray-900'}`}>
+                  <span className={`font-bold ${storyteller.role && storyteller.role.toLowerCase().includes('service provider') ? 'text-orange-sky' : 'text-gray-900'}`}>
                     {roleAnalytics.serviceProviders || 0}
                   </span>
                 </div>
@@ -482,7 +510,7 @@ export default async function StorytellerProfilePage({ params }: { params: { id:
                       ) : (
                         <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
                           <span className="text-sm font-semibold text-orange-sky">
-                            {similar.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
+                            {similar.name ? similar.name.split(' ').map(n => n[0] || '').join('').toUpperCase().slice(0, 2) : 'ST'}
                           </span>
                         </div>
                       )}
@@ -512,7 +540,7 @@ export default async function StorytellerProfilePage({ params }: { params: { id:
                       </div>
                       <div className="flex items-center gap-1">
                         <BookOpen className="w-3 h-3" />
-                        <span>{storiesData.filter((s: Story) => s.storytellerIds && s.storytellerIds.includes(similar.id)).length} stories</span>
+                        <span>{Array.isArray(storiesData) ? storiesData.filter((s: Story) => s.storytellerIds && Array.isArray(s.storytellerIds) && s.storytellerIds.includes(similar.id)).length : 0} stories</span>
                       </div>
                     </div>
                   </article>
@@ -524,4 +552,8 @@ export default async function StorytellerProfilePage({ params }: { params: { id:
       )}
     </div>
   )
+  } catch (error) {
+    console.error('Error in StorytellerProfilePage component:', error)
+    notFound()
+  }
 }

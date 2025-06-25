@@ -34,24 +34,24 @@ async function getStoryData(id: string) {
     }
 
     // Get related storytellers with safety checks
-    const relatedStorytellers = storytellersData.filter((st: Storyteller) => 
-      story.storytellerIds && story.storytellerIds.includes(st.id)
-    )
+    const relatedStorytellers = Array.isArray(storytellersData) ? storytellersData.filter((st: Storyteller) => 
+      story.storytellerIds && Array.isArray(story.storytellerIds) && story.storytellerIds.includes(st.id)
+    ) : []
 
     // Get related themes with details and safety checks
-    const relatedThemes = themesData.filter((t: Theme) => 
-      story.themeIds && story.themeIds.includes(t.id)
-    )
+    const relatedThemes = Array.isArray(themesData) ? themesData.filter((t: Theme) => 
+      story.themeIds && Array.isArray(story.themeIds) && story.themeIds.includes(t.id)
+    ) : []
 
     // Get suggested stories (same themes or storytellers) with safety checks
-    const suggestedStories = storiesData
+    const suggestedStories = Array.isArray(storiesData) ? storiesData
       .filter((s: Story) => 
         s.id !== id && (
-          (s.themeIds && story.themeIds && s.themeIds.some(themeId => story.themeIds.includes(themeId))) ||
-          (s.storytellerIds && story.storytellerIds && s.storytellerIds.some(stId => story.storytellerIds.includes(stId)))
+          (Array.isArray(s.themeIds) && Array.isArray(story.themeIds) && s.themeIds.some(themeId => story.themeIds.includes(themeId))) ||
+          (Array.isArray(s.storytellerIds) && Array.isArray(story.storytellerIds) && s.storytellerIds.some(stId => story.storytellerIds.includes(stId)))
         )
       )
-      .slice(0, 4)
+      .slice(0, 4) : []
 
     return {
       story,
@@ -122,12 +122,12 @@ export default async function StoryProfilePage({ params }: { params: { id: strin
               <div className="flex flex-wrap items-center gap-6 text-sm text-gray-600 mb-6">
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 h-4" />
-                  <time dateTime={story.createdAt}>
-                    {new Date(story.createdAt).toLocaleDateString('en-AU', {
+                  <time dateTime={story.createdAt || ''}>
+                    {story.createdAt ? new Date(story.createdAt).toLocaleDateString('en-AU', {
                       year: 'numeric',
                       month: 'long',
                       day: 'numeric'
-                    })}
+                    }) : 'Date unknown'}
                   </time>
                 </div>
                 <div className="flex items-center gap-2">
@@ -171,7 +171,7 @@ export default async function StoryProfilePage({ params }: { params: { id: strin
             <div className="lg:sticky lg:top-8">
               <div className="bg-gray-50 rounded-xl p-6">
                 <h2 className="text-xl font-semibold text-gray-900 mb-6">
-                  {story.storytellerNames && story.storytellerNames.length > 1 ? 'Storytellers' : 'Storyteller'}
+                  {story.storytellerNames && Array.isArray(story.storytellerNames) && story.storytellerNames.length > 1 ? 'Storytellers' : 'Storyteller'}
                 </h2>
                 
                 <div className="space-y-6">
@@ -183,7 +183,7 @@ export default async function StoryProfilePage({ params }: { params: { id: strin
                           <div className="relative w-16 h-16 rounded-full overflow-hidden">
                             <Image
                               src={storyteller.profileImage}
-                              alt={storyteller.name}
+                              alt={storyteller.name || 'Storyteller'}
                               fill
                               className="object-cover"
                               sizes="64px"
@@ -192,7 +192,7 @@ export default async function StoryProfilePage({ params }: { params: { id: strin
                         ) : (
                           <div className="w-16 h-16 rounded-full bg-orange-100 flex items-center justify-center">
                             <span className="text-lg font-semibold text-orange-sky">
-                              {storyteller.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
+                              {storyteller.name ? storyteller.name.split(' ').map(n => n[0] || '').join('').toUpperCase().slice(0, 2) : 'ST'}
                             </span>
                           </div>
                         )}
@@ -275,12 +275,12 @@ export default async function StoryProfilePage({ params }: { params: { id: strin
                 <div className="bg-gray-50 rounded-lg p-6">
                   <div className="prose prose-sm max-w-none">
                     <div className="text-gray-700 leading-relaxed whitespace-pre-line line-clamp-12">
-                      {story.storyTranscript.slice(0, 800)}
-                      {story.storyTranscript.length > 800 && '...'}
+                      {story.storyTranscript && typeof story.storyTranscript === 'string' ? story.storyTranscript.slice(0, 800) : ''}
+                      {story.storyTranscript && story.storyTranscript.length > 800 && '...'}
                     </div>
                   </div>
                   
-                  {story.storyTranscript.length > 800 && (
+                  {story.storyTranscript && story.storyTranscript.length > 800 && (
                     <button className="mt-4 text-sm font-medium text-orange-sky hover:text-orange-sky-dark">
                       Read Full Transcript
                     </button>
@@ -310,7 +310,7 @@ export default async function StoryProfilePage({ params }: { params: { id: strin
                       <div className="relative h-48 w-full">
                         <Image
                           src={relatedStory.profileImage}
-                          alt={relatedStory.title}
+                          alt={relatedStory.title || 'Story'}
                           fill
                           className="object-cover"
                         />
@@ -335,7 +335,7 @@ export default async function StoryProfilePage({ params }: { params: { id: strin
                       <div className="flex items-center gap-4 text-xs text-gray-500">
                         <div className="flex items-center gap-1">
                           <User className="w-3 h-3" />
-                          <span>{relatedStory.storytellerNames && relatedStory.storytellerNames.length > 0 ? relatedStory.storytellerNames.join(', ') : 'Unknown'}</span>
+                          <span>{relatedStory.storytellerNames && Array.isArray(relatedStory.storytellerNames) && relatedStory.storytellerNames.length > 0 ? relatedStory.storytellerNames.join(', ') : 'Unknown'}</span>
                         </div>
                         <div className="flex items-center gap-1">
                           <MapPin className="w-3 h-3" />
