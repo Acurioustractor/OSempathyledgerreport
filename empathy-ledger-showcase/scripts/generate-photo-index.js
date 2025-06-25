@@ -33,8 +33,25 @@ async function generatePhotoIndex() {
             iptc: true, 
             exif: true, 
             gps: true,
-            xmp: true 
+            xmp: true,
+            icc: true,
+            jfif: true,
+            ihdr: true,
+            tiff: true,
+            ifd0: true,
+            ifd1: true,
+            translateKeys: false,
+            translateValues: false,
+            reviveValues: false,
+            sanitize: false,
+            mergeOutput: false
           });
+          
+          // Debug: log all available EXIF fields for first photo
+          if (file.includes('5436')) {
+            console.log(`\nDEBUG - All EXIF fields for ${file}:`);
+            console.log(JSON.stringify(exif, null, 2));
+          }
         } catch (e) {
           console.warn(`Could not parse EXIF for ${file}:`, e.message);
         }
@@ -44,16 +61,21 @@ async function generatePhotoIndex() {
         const height = exif?.ExifImageHeight || exif?.ImageHeight || 600;
         
         // Extract tags - try multiple possible fields
-        let tags = exif?.Keywords || exif?.keywords || exif?.subject || [];
+        let tags = exif?.Keywords || exif?.keywords || exif?.subject || exif?.TagsList || 
+                   exif?.TagArray || exif?.SubjectArea || exif?.Categories || [];
         if (!Array.isArray(tags)) {
           tags = tags ? [tags] : [];
         }
         
-        // Extract location
-        const location = exif?.location || exif?.LocationName || exif?.City || null;
+        // Extract location - try many possible location fields
+        const location = exif?.location || exif?.LocationName || exif?.City || exif?.State || 
+                         exif?.Country || exif?.Province || exif?.Region || exif?.Area ||
+                         exif?.GPSAreaInformation || exif?.LocationCreatedCity || 
+                         exif?.LocationShownCity || null;
         
-        // Extract date
-        const date = exif?.DateTimeOriginal || exif?.CreateDate || null;
+        // Extract date - try multiple date fields
+        const date = exif?.DateTimeOriginal || exif?.CreateDate || exif?.DateTime || 
+                     exif?.DateTimeDigitized || exif?.ModifyDate || null;
 
         return {
           src: `/data/Photos/${file}`,
