@@ -4,13 +4,14 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "npm run fetch-data-if-needed && npm run generate-photo-index && next build",
+    "build": "npm run fetch-data-if-needed && npm run generate-photo-index && npm run add-metadata && next build",
     "build-production": "npm run fetch-data-if-needed && npm run generate-photo-index && next build",
     "start": "next start",
     "lint": "next lint",
     "fetch-data": "node scripts/fetch-and-process-data.js",
     "fetch-data-if-needed": "node scripts/fetch-data-if-needed.js",
     "generate-photo-index": "node scripts/generate-photo-index.js",
+    "add-metadata": "node scripts/add-sample-metadata.js",
     "optimize-images": "node scripts/optimize-images.js",
     "typecheck": "tsc --noEmit"
   },
