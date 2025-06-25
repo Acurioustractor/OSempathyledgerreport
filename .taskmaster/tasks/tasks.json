@@ -1,0 +1,405 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Project Setup and Repository Configuration",
+        "description": "Initialize the Next.js 14 project with TypeScript and Tailwind CSS, set up the GitHub repository, and configure Vercel deployment.",
+        "details": "1. Create a new Next.js 14 project with TypeScript support\n```bash\nnpx create-next-app@latest empathy-ledger-showcase --typescript --tailwind --eslint\n```\n2. Set up project structure with directories for components, pages, utils, hooks, and types\n3. Configure Tailwind CSS with appropriate color schemes and typography settings\n4. Initialize Git repository and create initial commit\n5. Set up GitHub repository with appropriate branch protection rules\n6. Configure Vercel project and link to GitHub repository\n7. Set up environment variables for Airtable API keys and other sensitive information",
+        "testStrategy": "Verify project builds successfully with no errors. Test deployment pipeline to Vercel staging environment. Ensure all environment variables are properly configured and accessible.",
+        "priority": "high",
+        "dependencies": [],
+        "status": "done",
+        "subtasks": []
+      },
+      {
+        "id": 2,
+        "title": "Implement Privacy-First Data Architecture",
+        "description": "Create the data fetching and privacy filtering utilities to securely access and process Airtable data according to the consent framework.",
+        "details": "1. Set up Airtable MCP connector for data fetching\n2. Implement the privacy filtering utility as specified in the PRD:\n```typescript\ninterface PrivacyConfig {\n  showPersonalDetails: boolean;\n  allowAnalytics: boolean;\n  displayLevel: 'full' | 'anonymous' | 'aggregate';\n}\n\nconst filterStoryData = (story: RawStory): PublicStory => {\n  return {\n    id: story.id,\n    content: story.hasContentConsent ? story.content : null,\n    themes: story.themes, // Always safe to show\n    location: story.location, // City level only\n    date: story.date,\n    storytellerProfile: story.hasProfileConsent ? {\n      role: story.storytellerRole,\n      journey: story.storytellerJourney\n    } : null\n  };\n};\n```\n3. Create type definitions for all data models (Storytellers, Stories, Themes, Shifts)\n4. Implement build-time data fetching using Next.js getStaticProps\n5. Set up the three-tier consent system (Internal, Public, Commercial) with appropriate filters",
+        "testStrategy": "Create mock data to test privacy filtering logic. Verify that content is properly filtered based on consent levels. Test with various consent scenarios to ensure privacy is maintained. Conduct a privacy audit to verify no sensitive information is exposed.",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "done",
+        "subtasks": []
+      },
+      {
+        "id": 3,
+        "title": "Develop Homepage Layout and Core Components",
+        "description": "Build the homepage layout with hero section, key metrics, navigation cards, and featured stories carousel according to FR-H1 through FR-H5.",
+        "details": "1. Create responsive layout for homepage with sections for hero, metrics, map, navigation cards, and featured stories\n2. Implement hero section with tagline \"102 Stories. 8 Cities. One Mission.\"\n3. Build animated counters for key statistics using a library like react-countup\n4. Create navigation cards linking to Stories, Storytellers, Analysis, and Wiki sections\n5. Implement featured stories carousel with privacy-aware previews\n6. Ensure all components are responsive and accessible\n7. Add skeleton loading states for dynamic content",
+        "testStrategy": "Test responsive design across multiple device sizes. Verify accessibility using automated tools (Lighthouse, axe) and manual testing. Ensure all navigation links work correctly. Test loading states and animations.",
+        "priority": "high",
+        "dependencies": [
+          1,
+          2
+        ],
+        "status": "done",
+        "subtasks": []
+      },
+      {
+        "id": 4,
+        "title": "Implement Interactive Map Component",
+        "description": "Create an interactive map showing the geographic distribution of stories at a city level as specified in FR-H3.",
+        "details": "1. Research and select an appropriate map library (e.g., react-leaflet, mapbox-gl)\n2. Implement map component with markers for each city where stories were collected\n3. Add tooltips showing the number of stories per location\n4. Implement zoom and pan functionality with appropriate limits\n5. Ensure the map is responsive and works on mobile devices\n6. Add click interactions to filter stories by location\n7. Implement fallback UI for cases where the map fails to load",
+        "testStrategy": "Test map rendering and interactions across different browsers and devices. Verify that location data is accurate and properly anonymized to city level only. Test accessibility of map interactions and ensure keyboard navigation is supported.",
+        "priority": "medium",
+        "dependencies": [
+          2,
+          3
+        ],
+        "status": "done",
+        "subtasks": []
+      },
+      {
+        "id": 5,
+        "title": "Build Stories Page with Filtering and View Options",
+        "description": "Develop the Stories page with grid/list view toggle and advanced filtering options as specified in FR-S1 through FR-S3.",
+        "details": "1. Create Stories page layout with filter sidebar and main content area\n2. Implement view toggle between grid and list views\n3. Build filter components for Location, Role, Themes, and Date\n4. Create Story Card component with privacy-safe previews\n5. Implement client-side filtering logic\n6. Add pagination or infinite scroll for story browsing\n7. Ensure all story data is filtered through the privacy utility\n8. Add visual indicators for consent level on each story",
+        "testStrategy": "Test filtering functionality with various combinations of filters. Verify that privacy filtering is correctly applied to all story data. Test view toggle and ensure both views render correctly. Verify pagination/infinite scroll works as expected.",
+        "priority": "high",
+        "dependencies": [
+          2
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create Stories Page Layout with Filter Sidebar",
+            "description": "Implement the basic layout structure for the Stories page with a responsive design that includes a collapsible filter sidebar and main content area for displaying stories.",
+            "dependencies": [],
+            "details": "Create a responsive grid layout using CSS Grid or Flexbox with two main sections: a left sidebar for filters (collapsible on mobile) and a main content area. Include a header section with the page title and view toggle buttons. Use semantic HTML elements for accessibility and implement the basic styling according to the design system.",
+            "status": "done",
+            "testStrategy": "Test responsive behavior across different screen sizes. Verify that the sidebar collapses properly on mobile devices and that the layout maintains proper spacing and alignment."
+          },
+          {
+            "id": 2,
+            "title": "Implement Grid/List View Toggle Functionality",
+            "description": "Create a toggle mechanism that allows users to switch between grid and list views for story display, with appropriate layout changes and persistence of the selected view.",
+            "dependencies": [
+              1
+            ],
+            "details": "Implement toggle buttons with appropriate icons for grid and list views. Create two distinct CSS layouts for the stories container - a grid layout with cards and a list layout with rows. Use state management to track the current view mode and persist it in local storage. Ensure smooth transitions between views using CSS transitions.",
+            "status": "done",
+            "testStrategy": "Test that toggling between views correctly changes the layout. Verify that the selected view persists when navigating away and returning to the page. Check that all story information remains accessible in both views."
+          },
+          {
+            "id": 3,
+            "title": "Build Filter Components with Interactive Controls",
+            "description": "Develop the filter sidebar components for Location, Role, Themes, and Date ranges with appropriate UI controls and state management.",
+            "dependencies": [
+              1
+            ],
+            "details": "Create reusable filter components with appropriate input types: dropdown/multi-select for Location and Role, checkboxes for Themes, and date pickers for Date range. Implement collapsible sections for each filter category. Add clear/reset functionality for individual filters and all filters. Ensure all filter controls are keyboard accessible and screen-reader friendly.",
+            "status": "done",
+            "testStrategy": "Test each filter component individually to ensure proper selection, deselection, and reset functionality. Verify that filter sections collapse and expand correctly. Test keyboard navigation and screen reader compatibility."
+          },
+          {
+            "id": 4,
+            "title": "Create Story Card Component with Privacy Controls",
+            "description": "Develop the Story Card component that displays story previews with appropriate privacy safeguards based on consent levels, for use in both grid and list views.",
+            "dependencies": [
+              2
+            ],
+            "details": "Design a reusable Story Card component that adapts to both grid and list views. Include fields for title, excerpt, location, themes, date, and contributor (if consented). Integrate with the privacy utility to filter displayed data based on consent levels. Add visual indicators (icons or badges) to show the privacy/consent level of each story. Implement appropriate hover states and focus indicators.",
+            "status": "done",
+            "testStrategy": "Test the component with various privacy settings to ensure proper data masking. Verify that visual indicators correctly reflect consent levels. Test the component in both grid and list views to ensure proper rendering and responsiveness."
+          },
+          {
+            "id": 5,
+            "title": "Implement Client-side Filtering and Pagination Logic",
+            "description": "Develop the logic to filter stories based on selected criteria and implement pagination or infinite scroll for browsing through large sets of stories.",
+            "dependencies": [
+              3,
+              4
+            ],
+            "details": "Create filter functions that process the raw story data based on selected filter criteria. Implement debouncing for filter operations to prevent excessive re-rendering. Develop either pagination controls or infinite scroll functionality based on design requirements. Ensure the filtering logic preserves the current page/scroll position when possible. Add loading states and empty state handling for when no stories match the filters.",
+            "status": "done",
+            "testStrategy": "Test filtering with various combinations of filter criteria to ensure correct results. Verify pagination/infinite scroll works correctly with different dataset sizes. Test edge cases like applying filters that result in no matching stories. Check performance with large datasets."
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "title": "Develop Storytellers Page with Privacy Controls",
+        "description": "Create the Storytellers page with respectful directory and filtering options as specified in FR-T1 through FR-T3.",
+        "details": "1. Implement Storytellers page layout with filter options and directory\n2. Create Storyteller Profile component that respects consent choices\n3. Build filtering by Location, Role, and Shift association\n4. Implement profile pages for individual storytellers (only for those with explicit consent)\n5. Add statistics for each storyteller (number of stories, themes discussed)\n6. Create journey visualization for storytellers who have shared and consented to this\n7. Add clear visual indicators for anonymity level based on storyteller preference",
+        "testStrategy": "Verify that only profiles with explicit consent are displayed. Test filtering functionality. Ensure all personal information is properly protected according to consent levels. Test profile pages with various consent scenarios.",
+        "priority": "high",
+        "dependencies": [
+          2
+        ],
+        "status": "done",
+        "subtasks": []
+      },
+      {
+        "id": 7,
+        "title": "Implement Basic Data Visualizations for Analysis Page",
+        "description": "Create the core visualizations for the Analysis page including theme analysis and geographic insights as specified in FR-A1 and FR-A2.",
+        "details": "1. Select and integrate a visualization library (Recharts or D3.js as specified)\n2. Implement word cloud visualization for themes\n3. Create theme frequency charts\n4. Build theme connections network graph\n5. Develop geographic visualization showing stories per location\n6. Implement regional theme differences visualization\n7. Ensure all visualizations are responsive and have appropriate fallbacks\n8. Add tooltips and interactive elements to enhance user understanding",
+        "testStrategy": "Test visualizations with various data sets. Verify responsive behavior on different screen sizes. Test accessibility of interactive elements. Ensure visualizations degrade gracefully when data is limited or missing.",
+        "priority": "medium",
+        "dependencies": [
+          2
+        ],
+        "status": "done",
+        "subtasks": []
+      },
+      {
+        "id": 8,
+        "title": "Develop Advanced Visualizations for Analysis Page",
+        "description": "Complete the Analysis page with role comparison and impact metrics visualizations as specified in FR-A3 and FR-A4.",
+        "details": "1. Implement visualizations comparing perspectives between Friends and Volunteers\n2. Create timeline visualization of the collection process\n3. Build engagement pattern visualizations\n4. Add interactive filters to allow users to explore the data\n5. Implement data export functionality for researchers\n6. Ensure all visualizations respect privacy settings and only use consented data\n7. Add context and explanations for each visualization to enhance understanding",
+        "testStrategy": "Test interactive elements and filters. Verify that privacy filtering is correctly applied to all visualization data. Test data export functionality. Ensure visualizations are accessible and include appropriate text alternatives.",
+        "priority": "medium",
+        "dependencies": [
+          7
+        ],
+        "status": "done",
+        "subtasks": []
+      },
+      {
+        "id": 9,
+        "title": "Set Up Wiki/Documentation Framework with MDX",
+        "description": "Implement the Wiki/Documentation page structure using MDX for flexible content formatting as specified in FR-W1.",
+        "details": "1. Set up Next.js MDX configuration\n```bash\nnpm install @next/mdx @mdx-js/loader @mdx-js/react\n```\n2. Create directory structure for wiki content\n3. Implement MDX components for rich formatting\n4. Set up navigation and search functionality for the wiki\n5. Create templates for different types of documentation pages\n6. Implement syntax highlighting for code snippets\n7. Add table of contents generation for long documents",
+        "testStrategy": "Test MDX rendering with various content types. Verify navigation and search functionality. Test accessibility of generated content. Ensure code snippets are properly formatted and highlighted.",
+        "priority": "medium",
+        "dependencies": [
+          1
+        ],
+        "status": "done",
+        "subtasks": []
+      },
+      {
+        "id": 10,
+        "title": "Create Wiki Content for How-To Guides and Resources",
+        "description": "Develop comprehensive wiki content including how-to guides, reflections, and downloadable resources as specified in FR-W2 through FR-W4.",
+        "details": "1. Create How-To Guides for:\n   - Airtable setup\n   - Content consent app\n   - Descript video workflow\n2. Develop Reflections & Learnings sections covering:\n   - What worked\n   - Challenges faced\n   - Lessons learned\n3. Build Resource Hub with downloadable assets:\n   - Templates\n   - Consent forms\n   - Code snippets\n4. Format all content using MDX\n5. Add appropriate metadata for search and navigation\n6. Ensure all downloadable resources are properly formatted and accessible",
+        "testStrategy": "Review all content for accuracy and completeness. Test downloads of all resources. Verify that content is properly formatted and accessible. Test search functionality with various queries.",
+        "priority": "medium",
+        "dependencies": [
+          9
+        ],
+        "status": "in-progress",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Develop MDX Templates for Wiki Content Types",
+            "description": "Create standardized MDX templates for how-to guides, reflections, and resource pages to ensure consistent formatting across all wiki content.",
+            "dependencies": [],
+            "details": "Design and implement MDX templates with appropriate frontmatter for metadata (title, description, tags, category). Create separate templates for: 1) How-to guides with step-by-step instructions, 2) Reflection pages with sections for successes, challenges, and lessons, 3) Resource pages with downloadable asset listings. Include styling components for callouts, code blocks, and asset downloads.",
+            "status": "pending",
+            "testStrategy": "Review templates with stakeholders and test with sample content to ensure they meet all formatting requirements and render correctly."
+          },
+          {
+            "id": 2,
+            "title": "Create How-To Guides for Technical Setup",
+            "description": "Develop comprehensive step-by-step guides for Airtable setup, Content consent app, and Descript video workflow using the established MDX template.",
+            "dependencies": [
+              1
+            ],
+            "details": "For each guide: 1) Document prerequisites and system requirements, 2) Provide detailed setup instructions with screenshots, 3) Include troubleshooting sections for common issues, 4) Add metadata for search optimization. Each guide should follow a consistent structure with introduction, steps, verification, and next actions.",
+            "status": "pending",
+            "testStrategy": "Have team members follow the guides to verify accuracy and completeness. Test all internal links and ensure screenshots are clear and relevant."
+          },
+          {
+            "id": 3,
+            "title": "Develop Reflections & Learnings Content",
+            "description": "Create reflection pages documenting what worked well, challenges faced, and lessons learned throughout the project implementation.",
+            "dependencies": [
+              1
+            ],
+            "details": "For each reflection area: 1) Interview team members to gather insights, 2) Organize content into 'What Worked', 'Challenges', and 'Lessons Learned' sections, 3) Include specific examples and quotes where appropriate, 4) Add recommendations for future implementations. Use the reflection MDX template and ensure content is constructive and actionable.",
+            "status": "pending",
+            "testStrategy": "Review content with project stakeholders to verify accuracy and ensure sensitive information is appropriately handled."
+          },
+          {
+            "id": 4,
+            "title": "Build Resource Hub with Downloadable Assets",
+            "description": "Create a resource hub section with properly formatted downloadable assets including templates, consent forms, and code snippets.",
+            "dependencies": [
+              1
+            ],
+            "details": "1) Organize and prepare all downloadable files in appropriate formats (PDF, DOCX, ZIP for code), 2) Create resource pages using the resource MDX template, 3) Group resources by category and include descriptions for each, 4) Implement download functionality with proper file handling, 5) Add version information and last updated dates for all resources.",
+            "status": "pending",
+            "testStrategy": "Test all downloads across different browsers and devices. Verify file integrity and ensure accessibility requirements are met for all downloadable content."
+          },
+          {
+            "id": 5,
+            "title": "Implement Search and Navigation for Wiki Content",
+            "description": "Set up metadata, tags, and navigation structure to make all wiki content easily discoverable and searchable.",
+            "dependencies": [
+              2,
+              3,
+              4
+            ],
+            "details": "1) Define a consistent tagging taxonomy for all content types, 2) Add appropriate metadata to all pages (title, description, tags, category), 3) Implement search functionality that indexes all content, 4) Create navigation menus and breadcrumbs for intuitive content browsing, 5) Add related content suggestions at the end of each page.",
+            "status": "pending",
+            "testStrategy": "Test search functionality with various queries to ensure relevant results. Conduct user testing to verify navigation is intuitive and content is easily discoverable."
+          }
+        ]
+      },
+      {
+        "id": 11,
+        "title": "Implement Responsive Design and Mobile Optimization",
+        "description": "Ensure the entire site is fully responsive and optimized for mobile devices according to the success metrics.",
+        "details": "1. Implement responsive layouts for all pages using Tailwind CSS breakpoints\n2. Optimize touch interactions for mobile users\n3. Create mobile-specific navigation (e.g., hamburger menu)\n4. Adjust visualizations for smaller screens\n5. Implement responsive images with appropriate sizing\n6. Test and optimize for various device sizes and orientations\n7. Ensure text remains readable on all screen sizes\n8. Optimize performance for mobile networks",
+        "testStrategy": "Test on multiple physical devices and using browser dev tools. Verify all functionality works on touch screens. Test on slow network connections. Measure and optimize performance metrics (LCP, FID, CLS) for mobile devices.",
+        "priority": "high",
+        "dependencies": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "status": "done",
+        "subtasks": []
+      },
+      {
+        "id": 12,
+        "title": "Implement Accessibility Features",
+        "description": "Ensure the site meets WCAG 2.1 AA accessibility standards as specified in the success metrics.",
+        "details": "1. Add proper semantic HTML throughout the application\n2. Implement keyboard navigation for all interactive elements\n3. Add ARIA attributes where necessary\n4. Ensure sufficient color contrast throughout the site\n5. Add skip navigation links\n6. Implement focus management for modals and dynamic content\n7. Add alt text for all images and descriptions for visualizations\n8. Test with screen readers and other assistive technologies",
+        "testStrategy": "Run automated accessibility tests using tools like axe-core. Conduct manual testing with keyboard navigation. Test with screen readers (NVDA, VoiceOver). Verify color contrast meets WCAG 2.1 AA standards. Create an accessibility audit report.",
+        "priority": "high",
+        "dependencies": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "status": "done",
+        "subtasks": []
+      },
+      {
+        "id": 13,
+        "title": "Implement Performance Optimizations",
+        "description": "Optimize the site to meet the performance target of < 3 seconds page load time as specified in the success metrics.",
+        "details": "1. Implement image optimization using Next.js Image component\n2. Set up code splitting and lazy loading for components\n3. Optimize and minimize CSS and JavaScript\n4. Implement caching strategies\n5. Add loading states and skeleton screens\n6. Optimize fonts with font-display and preloading\n7. Implement resource hints (preconnect, prefetch)\n8. Set up performance monitoring",
+        "testStrategy": "Measure performance using Lighthouse and Web Vitals. Test load times on various network conditions. Verify that lazy loading works correctly. Monitor Core Web Vitals (LCP, FID, CLS) and ensure they meet targets.",
+        "priority": "medium",
+        "dependencies": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 14,
+        "title": "Conduct Privacy Audit and Security Testing",
+        "description": "Perform a comprehensive privacy audit to ensure all data is properly protected according to the consent framework.",
+        "status": "done",
+        "dependencies": [
+          2,
+          5,
+          6,
+          7,
+          8
+        ],
+        "priority": "high",
+        "details": "1. Review all data flows and ensure privacy filtering is applied consistently\n2. Test all consent levels and verify data is properly filtered\n3. Check for any potential data leaks in API responses or client-side code\n4. Verify that no PII is exposed without explicit consent\n5. Test anonymity options (Full Name, Initials, Anonymous)\n6. Review all visualizations to ensure they don't inadvertently reveal sensitive information\n7. Document privacy measures for the wiki\n8. Create a privacy audit report",
+        "testStrategy": "Create test cases for various consent scenarios. Review network requests for data leaks. Conduct manual code review focusing on privacy. Test with mock data representing different consent levels. Verify that privacy indicators are clear and accurate.",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Initial Privacy Audit",
+            "description": "Completed initial privacy audit and created privacy audit report documenting current state.",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Add Privacy Utilities and Notice",
+            "description": "Added privacy utilities and privacy notice to inform users about data usage.",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Implement Consent-Based Filtering",
+            "description": "Implement filtering mechanisms based on user consent levels. Currently all data is displayed with full consent assumption.",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Test Consent-Based Filtering",
+            "description": "Create test scenarios for different consent levels and verify data is properly filtered according to each level.",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Update Privacy Documentation",
+            "description": "Update documentation to reflect the implementation of consent-based filtering and how it affects data display.",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "Final Security Review",
+            "description": "Conduct a final review of all privacy and security measures before production deployment.",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 15,
+        "title": "Final Deployment and Launch Preparation",
+        "description": "Prepare the site for production deployment, including final testing, documentation, and launch checklist.",
+        "details": "1. Run final build and deployment tests\n2. Verify all environment variables are properly set in production\n3. Test custom domain configuration\n4. Create deployment documentation\n5. Set up monitoring and error tracking\n6. Prepare launch announcement materials\n7. Create user documentation\n8. Conduct final cross-browser and device testing\n9. Verify analytics are properly configured (respecting privacy settings)\n10. Create a post-launch maintenance plan",
+        "testStrategy": "Conduct end-to-end testing of the entire site. Verify all features work in production environment. Test with real users if possible. Create a launch checklist and verify all items are completed. Monitor initial launch for any issues.",
+        "priority": "high",
+        "dependencies": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14
+        ],
+        "status": "pending",
+        "subtasks": []
+      }
+    ],
+    "metadata": {
+      "created": "2025-06-22T03:41:26.487Z",
+      "updated": "2025-06-23T08:02:18.692Z",
+      "description": "Tasks for master context"
+    }
+  }
+}

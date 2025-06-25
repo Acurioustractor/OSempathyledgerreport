@@ -1,0 +1,22 @@
+# version: '3.8'  # Removed as it's obsolete
+
+services:
+  empathy-ledger:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - AIRTABLE_API_KEY=${AIRTABLE_API_KEY}
+        - AIRTABLE_BASE_ID=${AIRTABLE_BASE_ID}
+    ports:
+      - "3002:3000"
+    environment:
+      - NODE_ENV=production
+      - AIRTABLE_API_KEY=${AIRTABLE_API_KEY}
+      - AIRTABLE_BASE_ID=${AIRTABLE_BASE_ID}
+    volumes:
+      # Mount the data directory for easy updates
+      - ./public/data:/app/public/data:ro
+      # Mount content directory for markdown editing
+      - ./content:/app/content
+    restart: unless-stopped

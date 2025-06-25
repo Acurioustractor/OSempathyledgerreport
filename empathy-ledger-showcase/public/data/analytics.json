@@ -1,0 +1,322 @@
+{
+  "overview": {
+    "totalStorytellers": 108,
+    "totalThemes": 447,
+    "totalQuotes": 590,
+    "totalStories": 25,
+    "totalMedia": 103,
+    "locationsCount": 15
+  },
+  "storytellers": {
+    "byRole": {
+      "volunteers": 51,
+      "friends": 30,
+      "serviceProviders": 26,
+      "other": 1
+    },
+    "byLocation": [
+      {
+        "location": "Mackay",
+        "count": 14,
+        "roles": {
+          "volunteers": 6,
+          "friends": 3
+        }
+      },
+      {
+        "location": "Hobart",
+        "count": 14,
+        "roles": {
+          "volunteers": 11,
+          "friends": 2
+        }
+      },
+      {
+        "location": "Newcastle",
+        "count": 10,
+        "roles": {
+          "volunteers": 5,
+          "friends": 4
+        }
+      },
+      {
+        "location": "Perth",
+        "count": 10,
+        "roles": {
+          "volunteers": 7,
+          "friends": 2
+        }
+      },
+      {
+        "location": "Central Coast",
+        "count": 10,
+        "roles": {
+          "volunteers": 4,
+          "friends": 4
+        }
+      },
+      {
+        "location": "Canberra",
+        "count": 9,
+        "roles": {
+          "volunteers": 5,
+          "friends": 3
+        }
+      },
+      {
+        "location": "Melbourne",
+        "count": 9,
+        "roles": {
+          "volunteers": 0,
+          "friends": 6
+        }
+      },
+      {
+        "location": "Adelaide",
+        "count": 8,
+        "roles": {
+          "volunteers": 6,
+          "friends": 2
+        }
+      },
+      {
+        "location": "Kalgoorlie",
+        "count": 8,
+        "roles": {
+          "volunteers": 1,
+          "friends": 0
+        }
+      },
+      {
+        "location": "Bundaburg",
+        "count": 4,
+        "roles": {
+          "volunteers": 4,
+          "friends": 0
+        }
+      },
+      {
+        "location": "Brisbane",
+        "count": 4,
+        "roles": {
+          "volunteers": 0,
+          "friends": 3
+        }
+      },
+      {
+        "location": "Gladestone",
+        "count": 3,
+        "roles": {
+          "volunteers": 1,
+          "friends": 1
+        }
+      },
+      {
+        "location": "Mount Isa",
+        "count": 3,
+        "roles": {
+          "volunteers": 0,
+          "friends": 0
+        }
+      },
+      {
+        "location": "Rockhampton",
+        "count": 2,
+        "roles": {
+          "volunteers": 1,
+          "friends": 0
+        }
+      }
+    ],
+    "averageQuotesPerStoryteller": "5.5",
+    "averageThemesPerStoryteller": "4.3"
+  },
+  "themes": {
+    "total": 447,
+    "withQuotes": 447,
+    "byCategory": [
+      [
+        "Connection",
+        161
+      ],
+      [
+        "Support",
+        103
+      ],
+      [
+        "Journey",
+        83
+      ],
+      [
+        "Other",
+        58
+      ],
+      [
+        "Challenge",
+        22
+      ],
+      [
+        "Dignity",
+        10
+      ],
+      [
+        "Hope",
+        9
+      ],
+      [
+        "Impact",
+        1
+      ]
+    ],
+    "topByStorytellers": [
+      {
+        "id": "recuEyBWkcxvir4TD",
+        "name": "Community Engagement",
+        "category": "Connection",
+        "storytellerCount": 7,
+        "quoteCount": 40
+      },
+      {
+        "id": "recKMvpxzKSxNdSvC",
+        "name": "Volunteering Experience",
+        "category": "Support",
+        "storytellerCount": 3,
+        "quoteCount": 16
+      },
+      {
+        "id": "rec8uHVw7PNb9hzOO",
+        "name": "Community Engagement and Volunteering",
+        "category": "Other",
+        "storytellerCount": 2,
+        "quoteCount": 13
+      },
+      {
+        "id": "recBWXgpvATjbuFeM",
+        "name": "Volunteering",
+        "category": "Journey",
+        "storytellerCount": 2,
+        "quoteCount": 14
+      },
+      {
+        "id": "recEu6oMyHxJTJ3jW",
+        "name": "Organizational Relationship and Structure",
+        "category": "Connection",
+        "storytellerCount": 2,
+        "quoteCount": 14
+      },
+      {
+        "id": "recFkwSkHdzamfnvE",
+        "name": "Active Volunteering",
+        "category": "Connection",
+        "storytellerCount": 2,
+        "quoteCount": 14
+      },
+      {
+        "id": "recHBmPUjoGk0gGWK",
+        "name": "Perception of Homelessness",
+        "category": "Connection",
+        "storytellerCount": 2,
+        "quoteCount": 16
+      },
+      {
+        "id": "recJfWL2hTaGi4vqz",
+        "name": "Volunteering and Community Service",
+        "category": "Support",
+        "storytellerCount": 2,
+        "quoteCount": 11
+      },
+      {
+        "id": "recLXgljuvwE3o3oT",
+        "name": "Personal Connection and Motivation",
+        "category": "Connection",
+        "storytellerCount": 2,
+        "quoteCount": 14
+      },
+      {
+        "id": "recSkZ9LoQ9VgE232",
+        "name": "Post-retirement Engagement",
+        "category": "Support",
+        "storytellerCount": 2,
+        "quoteCount": 14
+      },
+      {
+        "id": "recWVCsdrfcY6bw74",
+        "name": "Profession & Experience",
+        "category": "Journey",
+        "storytellerCount": 2,
+        "quoteCount": 6
+      },
+      {
+        "id": "recX8Vy8sAjZfmej6",
+        "name": "Personal Backgrounds",
+        "category": "Journey",
+        "storytellerCount": 2,
+        "quoteCount": 6
+      },
+      {
+        "id": "recXZtluO7iTrEdhC",
+        "name": "Faith and Spirituality",
+        "category": "Support",
+        "storytellerCount": 2,
+        "quoteCount": 13
+      },
+      {
+        "id": "recY9paXE7PBIr57j",
+        "name": "Volunteering",
+        "category": "Other",
+        "storytellerCount": 2,
+        "quoteCount": 6
+      },
+      {
+        "id": "recZm6tQ7OeOLY5Ez",
+        "name": "Community Support",
+        "category": "Connection",
+        "storytellerCount": 2,
+        "quoteCount": 10
+      },
+      {
+        "id": "recZtx2b5oOQ6xhiw",
+        "name": "The Unfamiliar Local Site",
+        "category": "Other",
+        "storytellerCount": 2,
+        "quoteCount": 6
+      },
+      {
+        "id": "recjwcHTzTvuHvjfT",
+        "name": "Concept of Friendship",
+        "category": "Connection",
+        "storytellerCount": 2,
+        "quoteCount": 10
+      },
+      {
+        "id": "recsvXTTT23sQle8I",
+        "name": "Cultural Heritage",
+        "category": "Hope",
+        "storytellerCount": 2,
+        "quoteCount": 16
+      },
+      {
+        "id": "recyNLuyreSXLU648",
+        "name": "Personal Transformation",
+        "category": "Connection",
+        "storytellerCount": 2,
+        "quoteCount": 18
+      },
+      {
+        "id": "recyT7lt7vrUgZH4N",
+        "name": "Volunteering at Orange Sky",
+        "category": "Hope",
+        "storytellerCount": 2,
+        "quoteCount": 17
+      }
+    ]
+  },
+  "quotes": {
+    "total": 590,
+    "byRole": {
+      "volunteers": 297,
+      "friends": 147
+    },
+    "averageLength": 124
+  }
+}

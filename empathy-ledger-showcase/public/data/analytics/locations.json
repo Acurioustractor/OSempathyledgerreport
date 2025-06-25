@@ -1,0 +1,122 @@
+{
+  "total": 23,
+  "distribution": {
+    "Palm Island": 0,
+    "Tennant Creek": 0,
+    "Spain": 0,
+    "Brisbane": 0,
+    "Rockhampton": 0,
+    "Mackay": 0,
+    "Canberra": 3,
+    "Mount Isa": 0,
+    "Kalgoorlie": 0,
+    "Perth": 0,
+    "Hobart": 3,
+    "Gladstone": 0,
+    "Stradbroke Island": 0,
+    "Central Coast": 0,
+    "Darwin": 0,
+    "Athens": 0,
+    "Toowoomba": 0,
+    "Adelaide": 7,
+    "Witta": 0,
+    "Melbourne": 12,
+    "Newcastle": 0,
+    "Alice Springs": 0,
+    "Bundaburg": 0
+  },
+  "sorted": [
+    {
+      "location": "Melbourne",
+      "count": 12
+    },
+    {
+      "location": "Adelaide",
+      "count": 7
+    },
+    {
+      "location": "Canberra",
+      "count": 3
+    },
+    {
+      "location": "Hobart",
+      "count": 3
+    },
+    {
+      "location": "Palm Island",
+      "count": 0
+    },
+    {
+      "location": "Tennant Creek",
+      "count": 0
+    },
+    {
+      "location": "Spain",
+      "count": 0
+    },
+    {
+      "location": "Brisbane",
+      "count": 0
+    },
+    {
+      "location": "Rockhampton",
+      "count": 0
+    },
+    {
+      "location": "Mackay",
+      "count": 0
+    },
+    {
+      "location": "Mount Isa",
+      "count": 0
+    },
+    {
+      "location": "Kalgoorlie",
+      "count": 0
+    },
+    {
+      "location": "Perth",
+      "count": 0
+    },
+    {
+      "location": "Gladstone",
+      "count": 0
+    },
+    {
+      "location": "Stradbroke Island",
+      "count": 0
+    },
+    {
+      "location": "Central Coast",
+      "count": 0
+    },
+    {
+      "location": "Darwin",
+      "count": 0
+    },
+    {
+      "location": "Athens",
+      "count": 0
+    },
+    {
+      "location": "Toowoomba",
+      "count": 0
+    },
+    {
+      "location": "Witta",
+      "count": 0
+    },
+    {
+      "location": "Newcastle",
+      "count": 0
+    },
+    {
+      "location": "Alice Springs",
+      "count": 0
+    },
+    {
+      "location": "Bundaburg",
+      "count": 0
+    }
+  ]
+}

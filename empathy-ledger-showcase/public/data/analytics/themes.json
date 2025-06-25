@@ -1,0 +1,137 @@
+{
+  "total": 52,
+  "distribution": {
+    "Aaron's experiences allow insight into homelessnes...": 3,
+    "The speaker discusses societal views and governmental approaches to homelessness and immigrants, reflecting on his personal feelings of being let down": 2,
+    "The transcript highlights Ro": 1,
+    "The conversation alludes to long-term relationships among the speakers,": 2,
+    "The conversation takes a personal turn as Chris both introduces himself and provides in": 3,
+    "Despite the myriad of challenges faced, the speake...": 2,
+    "This theme explores the difficulties in achieving proper focus": 3,
+    "There's an ongoing dialogue between several people": 2,
+    "The initial part of the transcript involves testing and setting up the recording equipment": 2,
+    "The social support and community found at Six Shift has been essential for Julie": 2,
+    "Both Tracy and Jared are volunteers dedicated to an organization": 2,
+    "Pamela expresses her love and passion": 1,
+    "The account of Jean's childbirth complications, di...": 2,
+    "Volunteering": 1,
+    "The transcript discusses the organizational structure and relationships, as evidenced": 2,
+    "Participants are sharing personal stories and experiences making this a primary theme": 2,
+    "The speaker talks about his immigration journey as...": 2,
+    "Briget credits her parents for instilling in her a spirit of generosity and giving": 3,
+    "The conversation starts": 1,
+    "The mention of food distribution (fruit, veggies) implies social support": 2,
+    "The speaker, Briget Perry, introduces herself and provides some in": 3,
+    "There is a segment where Speaker 9, Drew Nichols, ...": 2,
+    "This theme revolves around the struggle faced": 2,
+    "Both Tracy and Jared have personal connection and motivation for volunteering": 2,
+    "Chris, a software developer, speaks about his married life with Maria Gabriel": 3,
+    "Drew Nichols expounds upon the significance of sha...": 2,
+    "Felicity reveals a tolerant attitude towards misgendering, attributing it to her lengthy time living as male. She maintains a casual demeanor when others incorrectly refer to her": 1,
+    "Jean and David's journey from England to Australia showcases challenges faced": 2,
+    "The speaker highlights the significance of communi...": 1,
+    "The speaker is an artist and musician who is currently living on the streets, describing his experiences": 1,
+    "Both Tracy and Jared started volunteering after retirement, making it a key theme": 2,
+    "COVID-19 has significantly changed her life and she had to find new avenues to access needed services. The pandemic coincided": 2,
+    "Julie consistently expresses her determination to ...": 2,
+    "Aaron Stapleton shares his personal story, detailing a dramatic transition from managing a company to living on the streets as a result of a sequence of un": 3,
+    "Ro": 1,
+    "Briget expresses her love": 3,
+    "Briget expresses her eagerness to get involved": 3,
+    "Love and commitment are evident as David supports Jean through her health struggles": 2,
+    "This conversation includes Pamela discussing her search": 1,
+    "The speaker provides personal insights into his experiences of homelessness": 2,
+    "Aaron highlights the importance of services like laundry provided": 3,
+    "Speaker 9 shares his background, living situation, and his deep commitment for community service": 2,
+    "This theme explores the subject of migration, as C...": 3,
+    "The speaker underscores the need": 1,
+    "Despite the obstacles Aaron faced, he is currently...": 3,
+    "The speaker describes the essential role of Orange...": 1,
+    "Pamela Ramsey shares about her family, which includes two grown daughters and four grandsons": 1,
+    "Felicity Davis-Smith discusses her experiences and feelings as a binary trans woman": 1,
+    "Felicity emphasizes the importance of her chosen name and the correct pronunciation": 1,
+    "Julie Jaunty's life has been dominated": 2,
+    "Felicity shares about her rough upbringing, hinting at lived experiences that have shaped her resilience and attitude towards life, including dealing": 1
+  },
+  "categoryDistribution": {
+    "Journey": 33,
+    "Dignity": 2,
+    "Challenge": 8,
+    "Connection": 30,
+    "Support": 19,
+    "Other": 7,
+    "Hope": 1
+  },
+  "top10": [
+    {
+      "id": "rec0WS7FfgbeSXYTk",
+      "name": "Aaron's experiences allow insight into homelessnes...",
+      "category": "Journey",
+      "count": 3,
+      "percentage": "12.0"
+    },
+    {
+      "id": "rec8pynVha5ZPl4aY",
+      "name": "The conversation takes a personal turn as Chris both introduces himself and provides in",
+      "category": "Support",
+      "count": 3,
+      "percentage": "12.0"
+    },
+    {
+      "id": "recA7KrEd6ZZ6NwXT",
+      "name": "This theme explores the difficulties in achieving proper focus",
+      "category": "Challenge",
+      "count": 3,
+      "percentage": "12.0"
+    },
+    {
+      "id": "recGbLuqeuLHuPFyN",
+      "name": "Briget credits her parents for instilling in her a spirit of generosity and giving",
+      "category": "Connection",
+      "count": 3,
+      "percentage": "12.0"
+    },
+    {
+      "id": "recHieZerfPg8iqWD",
+      "name": "The speaker, Briget Perry, introduces herself and provides some in",
+      "category": "Support",
+      "count": 3,
+      "percentage": "12.0"
+    },
+    {
+      "id": "recM51tZEZyIjk7VK",
+      "name": "Chris, a software developer, speaks about his married life with Maria Gabriel",
+      "category": "Journey",
+      "count": 3,
+      "percentage": "12.0"
+    },
+    {
+      "id": "recavI8ku48dJrTQC",
+      "name": "Aaron Stapleton shares his personal story, detailing a dramatic transition from managing a company to living on the streets as a result of a sequence of un",
+      "category": "Journey",
+      "count": 3,
+      "percentage": "12.0"
+    },
+    {
+      "id": "reccpniUkftUThinE",
+      "name": "Briget expresses her love",
+      "category": "Support",
+      "count": 3,
+      "percentage": "12.0"
+    },
+    {
+      "id": "recgokWjjlc2lVsvU",
+      "name": "Briget expresses her eagerness to get involved",
+      "category": "Connection",
+      "count": 3,
+      "percentage": "12.0"
+    },
+    {
+      "id": "recm1qAwzZBewi39Z",
+      "name": "Aaron highlights the importance of services like laundry provided",
+      "category": "Support",
+      "count": 3,
+      "percentage": "12.0"
+    }
+  ]
+}

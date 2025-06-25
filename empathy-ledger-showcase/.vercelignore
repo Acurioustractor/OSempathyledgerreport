@@ -1,0 +1,144 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Testing
+coverage/
+.nyc_output/
+
+# Next.js
+.next/
+out/
+build/
+
+# Production
+dist/
+
+# Misc
+.DS_Store
+*.pem
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Local env files
+.env*.local
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Documentation
+*.md
+docs/
+CONTRIBUTING.md
+README.md
+LICENSE
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+
+# Development tools
+.editorconfig
+.eslintrc*
+.prettierrc*
+.stylelintrc*
+.huskyrc*
+.lintstagedrc*
+
+# Test files
+__tests__/
+test/
+tests/
+*.test.js
+*.test.ts
+*.spec.js
+*.spec.ts
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# Logs
+logs/
+*.log
+
+# Cache
+.cache/
+.parcel-cache/
+.turbo/
+
+# Build tools config
+webpack.config.js
+rollup.config.js
+gulpfile.js
+Gruntfile.js
+
+# Package managers
+.yarn/
+.pnpm-store/
+pnpm-lock.yaml
+yarn.lock
+package-lock.json
+
+# Scripts
+# Keep scripts folder for build process
+# scripts/
+*.sh
+
+# Storybook
+.storybook/
+storybook-static/
+
+# Cursor rules
+.cursorrules
+
+# Project specific
+empathy-ledger-architecture-plan.md
+empathy-ledger-showcase-prd.md
+PROJECT_SUMMARY.md
+builder.config.json
+.mcp.json
+.taskmaster/
+.roo/
+.roomodes
+.windsurf/
+.trae/
+.cursor/
+.clinerules/
+AGENTS.md
+CLAUDE.md
+
+# Large media files
+# Photos are now optimized and included
+# public/data/Photos/
+public/data/raw-airtable-data.json

@@ -1,0 +1,13 @@
+{
+  "framework": "nextjs",
+  "buildCommand": "npm run build",
+  "regions": ["sfo1"],
+  "functions": {
+    "src/app/api/stories/route.ts": {
+      "maxDuration": 10
+    },
+    "src/app/api/health/route.ts": {
+      "maxDuration": 5
+    }
+  }
+}
