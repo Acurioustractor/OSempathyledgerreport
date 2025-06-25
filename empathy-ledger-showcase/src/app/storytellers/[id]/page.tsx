@@ -20,7 +20,7 @@ async function getStorytellerData(id: string) {
 
     // Get stories by this storyteller
     const relatedStories = storiesData.filter((s: Story) => 
-      s.storytellerIds.includes(storyteller.id)
+      s.storytellerIds && s.storytellerIds.includes(storyteller.id)
     )
 
     // Get themes associated with this storyteller
@@ -512,7 +512,7 @@ export default async function StorytellerProfilePage({ params }: { params: { id:
                       </div>
                       <div className="flex items-center gap-1">
                         <BookOpen className="w-3 h-3" />
-                        <span>{storiesData.filter((s: Story) => s.storytellerIds.includes(similar.id)).length} stories</span>
+                        <span>{storiesData.filter((s: Story) => s.storytellerIds && s.storytellerIds.includes(similar.id)).length} stories</span>
                       </div>
                     </div>
                   </article>

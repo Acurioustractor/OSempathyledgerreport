@@ -171,7 +171,7 @@ export default async function StoryProfilePage({ params }: { params: { id: strin
             <div className="lg:sticky lg:top-8">
               <div className="bg-gray-50 rounded-xl p-6">
                 <h2 className="text-xl font-semibold text-gray-900 mb-6">
-                  {story.storytellerNames.length > 1 ? 'Storytellers' : 'Storyteller'}
+                  {story.storytellerNames && story.storytellerNames.length > 1 ? 'Storytellers' : 'Storyteller'}
                 </h2>
                 
                 <div className="space-y-6">
@@ -335,7 +335,7 @@ export default async function StoryProfilePage({ params }: { params: { id: strin
                       <div className="flex items-center gap-4 text-xs text-gray-500">
                         <div className="flex items-center gap-1">
                           <User className="w-3 h-3" />
-                          <span>{relatedStory.storytellerNames.join(', ')}</span>
+                          <span>{relatedStory.storytellerNames && relatedStory.storytellerNames.length > 0 ? relatedStory.storytellerNames.join(', ') : 'Unknown'}</span>
                         </div>
                         <div className="flex items-center gap-1">
                           <MapPin className="w-3 h-3" />
