@@ -50,7 +50,8 @@ async function getStorytellerData(id: string) {
       similarStorytellers,
       roleAnalytics,
       locationAnalytics,
-      analytics: analyticsData
+      analytics: analyticsData,
+      storiesData
     }
   } catch (error) {
     console.error('Error loading storyteller data:', error)
@@ -65,7 +66,7 @@ export default async function StorytellerProfilePage({ params }: { params: { id:
     notFound()
   }
 
-  const { storyteller, relatedStories, relatedThemes, similarStorytellers, roleAnalytics, locationAnalytics } = data
+  const { storyteller, relatedStories, relatedThemes, similarStorytellers, roleAnalytics, locationAnalytics, storiesData } = data
 
   // Find location stats
   const locationStats = locationAnalytics.find((loc: any) => loc.location === storyteller.location)
@@ -511,7 +512,7 @@ export default async function StorytellerProfilePage({ params }: { params: { id:
                       </div>
                       <div className="flex items-center gap-1">
                         <BookOpen className="w-3 h-3" />
-                        <span>{similar.storyCount || 0} stories</span>
+                        <span>{storiesData.filter((s: Story) => s.storytellerIds.includes(similar.id)).length} stories</span>
                       </div>
                     </div>
                   </article>

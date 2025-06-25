@@ -23,7 +23,7 @@ async function generatePhotoIndex() {
     console.log(`Found ${imageFiles.length} images`);
 
     const photos = await Promise.all(
-      imageFiles.map(async (file) => {
+      imageFiles.slice(0, 50).map(async (file) => {
         const filePath = path.join(PHOTOS_DIR, file);
         const fileBuffer = fs.readFileSync(filePath);
         let exif = {};

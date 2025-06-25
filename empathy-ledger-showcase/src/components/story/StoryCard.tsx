@@ -2,23 +2,26 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Calendar, Users, Video, FileText } from 'lucide-react'
 import { Story } from '@/types'
+import { useState } from 'react'
 
 interface StoryCardProps {
   story: Story
 }
 
 export default function StoryCard({ story }: StoryCardProps) {
+  const [imageError, setImageError] = useState(false)
   return (
     <Link href={`/stories/${story.id}`}>
       <article className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden h-full flex flex-col">
         {/* Image or Video Thumbnail */}
-        {story.profileImage ? (
+        {story.profileImage && !imageError ? (
           <div className="relative h-48 w-full">
             <Image
               src={story.profileImage}
               alt={story.title}
               fill
               className="object-cover"
+              onError={() => setImageError(true)}
             />
             {story.hasVideo && (
               <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30">

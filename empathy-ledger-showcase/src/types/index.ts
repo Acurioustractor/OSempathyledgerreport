@@ -40,7 +40,6 @@ export interface Storyteller {
   id: string;
   name: string;
   role: string;
-  project: string;
   location?: string;
   bio?: string;
   quote?: string;
@@ -48,14 +47,21 @@ export interface Storyteller {
   quotes?: string[];
   profileImage?: string;
   hasProfile?: boolean;
-  storyCount: number;
+  storyCount?: number;
   storyIds?: string[];
   mediaCount?: number;
-  themes: string[];
+  mediaIds?: string[];
+  themes?: string[];
   themeIds?: string[];
   videoDraftLink?: string;
   transcript?: string;
   createdAt?: string;
+  journey?: string;
+  quoteCount?: number;
+  transcriptCount?: number;
+  hasContentConsent?: boolean;
+  hasProfileConsent?: boolean;
+  privacyLevel?: string;
 }
 
 export interface Media {

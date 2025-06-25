@@ -2,12 +2,14 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { User, MapPin, BookOpen, Quote } from 'lucide-react'
 import { Storyteller } from '@/types'
+import { useState } from 'react'
 
 interface StorytellerCardProps {
   storyteller: Storyteller
 }
 
 export default function StorytellerCard({ storyteller }: StorytellerCardProps) {
+  const [imageError, setImageError] = useState(false)
   const initials = storyteller.name
     .split(' ')
     .map(n => n[0])
@@ -23,7 +25,7 @@ export default function StorytellerCard({ storyteller }: StorytellerCardProps) {
         <div className="flex items-start gap-4">
           {/* Profile Image or Initials */}
           <div className="flex-shrink-0">
-            {storyteller.profileImage && typeof storyteller.profileImage === 'string' ? (
+            {storyteller.profileImage && typeof storyteller.profileImage === 'string' && !imageError ? (
               <div className="relative w-16 h-16 rounded-full overflow-hidden">
                 <Image
                   src={storyteller.profileImage}
@@ -31,6 +33,7 @@ export default function StorytellerCard({ storyteller }: StorytellerCardProps) {
                   fill
                   className="object-cover"
                   sizes="64px"
+                  onError={() => setImageError(true)}
                 />
               </div>
             ) : (
@@ -82,10 +85,10 @@ export default function StorytellerCard({ storyteller }: StorytellerCardProps) {
         {/* Stats */}
         <div className="mt-4 flex items-center justify-between">
           <div className="flex items-center gap-4 text-sm">
-            {storyteller.storyCount > 0 && (
+            {storyteller.quotes && storyteller.quotes.length > 0 && (
               <div className="flex items-center gap-1 text-gray-600">
-                <BookOpen className="w-4 h-4" />
-                <span>{storyteller.storyCount} {storyteller.storyCount === 1 ? 'story' : 'stories'}</span>
+                <Quote className="w-4 h-4" />
+                <span>{storyteller.quotes.length} {storyteller.quotes.length === 1 ? 'quote' : 'quotes'}</span>
               </div>
             )}
             {storyteller.themes && storyteller.themes.length > 0 && (

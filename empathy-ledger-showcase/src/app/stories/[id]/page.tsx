@@ -8,6 +8,12 @@ import { Story, Storyteller, Theme } from '@/types'
 
 async function getStoryData(id: string) {
   try {
+    // Validate input
+    if (!id || typeof id !== 'string' || id.trim() === '') {
+      console.error('Invalid story ID provided:', id)
+      return null
+    }
+
     const [storiesData, storytellersData, themesData, analyticsData] = await Promise.all([
       fs.readFile(path.join(process.cwd(), 'public/data/stories.json'), 'utf8').then(data => JSON.parse(data)),
       fs.readFile(path.join(process.cwd(), 'public/data/storytellers.json'), 'utf8').then(data => JSON.parse(data)),
@@ -15,25 +21,34 @@ async function getStoryData(id: string) {
       fs.readFile(path.join(process.cwd(), 'public/data/analytics.json'), 'utf8').then(data => JSON.parse(data))
     ])
 
+    // Validate data loaded successfully
+    if (!Array.isArray(storiesData) || !Array.isArray(storytellersData) || !Array.isArray(themesData)) {
+      console.error('Invalid data format loaded from files')
+      return null
+    }
+
     const story = storiesData.find((s: Story) => s.id === id)
-    if (!story) return null
+    if (!story) {
+      console.error('Story not found for ID:', id)
+      return null
+    }
 
-    // Get related storytellers
+    // Get related storytellers with safety checks
     const relatedStorytellers = storytellersData.filter((st: Storyteller) => 
-      story.storytellerIds.includes(st.id)
+      story.storytellerIds && story.storytellerIds.includes(st.id)
     )
 
-    // Get related themes with details
+    // Get related themes with details and safety checks
     const relatedThemes = themesData.filter((t: Theme) => 
-      story.themeIds.includes(t.id)
+      story.themeIds && story.themeIds.includes(t.id)
     )
 
-    // Get suggested stories (same themes or storytellers)
+    // Get suggested stories (same themes or storytellers) with safety checks
     const suggestedStories = storiesData
       .filter((s: Story) => 
         s.id !== id && (
-          s.themeIds.some(themeId => story.themeIds.includes(themeId)) ||
-          s.storytellerIds.some(stId => story.storytellerIds.includes(stId))
+          (s.themeIds && story.themeIds && s.themeIds.some(themeId => story.themeIds.includes(themeId))) ||
+          (s.storytellerIds && story.storytellerIds && s.storytellerIds.some(stId => story.storytellerIds.includes(stId)))
         )
       )
       .slice(0, 4)
@@ -47,18 +62,36 @@ async function getStoryData(id: string) {
     }
   } catch (error) {
     console.error('Error loading story data:', error)
+    console.error('Error details:', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      storyId: id
+    })
     return null
   }
 }
 
 export default async function StoryProfilePage({ params }: { params: { id: string } }) {
-  const data = await getStoryData(params.id)
-  
-  if (!data) {
-    notFound()
-  }
+  try {
+    // Validate params
+    if (!params || !params.id) {
+      console.error('Missing params or params.id')
+      notFound()
+    }
 
-  const { story, relatedStorytellers, relatedThemes, suggestedStories } = data
+    const data = await getStoryData(params.id)
+    
+    if (!data) {
+      notFound()
+    }
+
+    const { story, relatedStorytellers, relatedThemes, suggestedStories } = data
+
+    // Additional validation
+    if (!story || !story.id || !story.title) {
+      console.error('Invalid story data structure')
+      notFound()
+    }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -319,4 +352,8 @@ export default async function StoryProfilePage({ params }: { params: { id: strin
       )}
     </div>
   )
+  } catch (error) {
+    console.error('Error in StoryProfilePage component:', error)
+    notFound()
+  }
 }

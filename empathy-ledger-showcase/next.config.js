@@ -17,6 +17,9 @@ const nextConfig = {
     optimizeCss: false,
   },
   
+  // Build configuration
+  outputFileTracing: false,
+  
   // Security and caching headers
   async headers() {
     return [
