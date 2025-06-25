@@ -18,6 +18,11 @@ import { consentFormsContent } from '@/data/docs/consent-forms'
 import { photographerWorkflowContent } from '@/data/docs/photographer-workflow'
 import { airtableSystemContent } from '@/data/docs/airtable-system'
 import { contentGuideContent } from '@/data/docs/content-guide'
+import { yourStoryMattersContent } from '@/data/docs/your-story-matters'
+import { sharingStoryContent } from '@/data/docs/sharing-story'
+import { appScreensContent } from '@/data/docs/app-screens'
+import { storytellingPracticesContent } from '@/data/docs/storytelling-practices'
+import { inhouseStoriesContent } from '@/data/docs/inhouse-stories'
 
 // Map slugs to content
 const contentMap: Record<string, WikiSection[]> = {
@@ -31,6 +36,11 @@ const contentMap: Record<string, WikiSection[]> = {
   'photographer-workflow': photographerWorkflowContent,
   'airtable-system': airtableSystemContent,
   'content-guide': contentGuideContent,
+  'your-story-matters': yourStoryMattersContent,
+  'sharing-story': sharingStoryContent,
+  'app-screens': appScreensContent,
+  'storytelling-practices': storytellingPracticesContent,
+  'inhouse-stories': inhouseStoriesContent,
   // Add more mappings as you create content
 }
 
