@@ -12,6 +12,26 @@ const exifr = require('exifr');
 const PHOTOS_DIR = path.join(__dirname, '../public/data/Photos-original');
 const METADATA_BACKUP = path.join(__dirname, '../public/data/original-photo-metadata.json');
 
+// Helper function to extract city names from address fields
+function extractCityFromAddress(address) {
+  if (!address || typeof address !== 'string') return null;
+  
+  const australianCities = [
+    'Adelaide', 'Brisbane', 'Canberra', 'Darwin', 'Hobart', 
+    'Melbourne', 'Perth', 'Sydney', 'Gold Coast', 'Newcastle',
+    'Wollongong', 'Geelong', 'Townsville', 'Cairns', 'Toowoomba',
+    'Ballarat', 'Bendigo', 'Albury', 'Launceston', 'Mackay'
+  ];
+  
+  const lowerAddress = address.toLowerCase();
+  for (const city of australianCities) {
+    if (lowerAddress.includes(city.toLowerCase())) {
+      return city;
+    }
+  }
+  return null;
+}
+
 async function extractRealMetadata() {
   console.log('🔍 Extracting REAL metadata from original photos...');
   
@@ -78,9 +98,11 @@ async function extractRealMetadata() {
             title: exif.Title || exif.ObjectName,
             description: exif.ImageDescription || exif.Caption,
             
-            // Location data from IPTC
+            // Location data from IPTC and Creator Contact Info
             location: {
-              city: exif.City || exif.LocationCreatedCity || exif.LocationShownCity,
+              city: exif.City || exif.LocationCreatedCity || exif.LocationShownCity || 
+                    exif.CreatorContactInfo?.CiAdrCity || 
+                    extractCityFromAddress(exif.CreatorContactInfo?.CiAdrExtadr),
               state: exif.State || exif.Province || exif.LocationCreatedState,
               country: exif.Country || exif.LocationCreatedCountry,
               countryCode: exif.CountryCode,

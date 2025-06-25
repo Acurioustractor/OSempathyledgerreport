@@ -134,7 +134,7 @@ const PhotosPageClient = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-4xl font-bold mb-8 text-center">Photo Gallery</h1>
+      <h1 className="text-4xl font-bold mb-8 text-center text-gray-900">Photo Gallery</h1>
       <div className="flex flex-col md:flex-row gap-4 justify-center mb-8">
         {/* Tag filter */}
         <div>
