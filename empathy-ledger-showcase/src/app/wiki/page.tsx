@@ -35,7 +35,7 @@ export default function WikiLandingPage() {
             Empathy Ledger Wiki
           </h1>
           <p className="wiki-subtitle">
-            Comprehensive documentation and guides for the Empathy Ledger platform.
+            Comprehensive documentation and guides for the Empathy Ledger platform
           </p>
         </div>
       </section>
