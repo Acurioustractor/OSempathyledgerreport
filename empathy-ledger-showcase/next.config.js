@@ -80,11 +80,7 @@ const nextConfig = {
   
   async redirects() {
     return [
-      {
-        source: '/wiki',
-        destination: '/docs/introduction',
-        permanent: false,
-      },
+      // Removed wiki redirect to allow wiki pages to work
     ]
   },
   
