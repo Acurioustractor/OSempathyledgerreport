@@ -357,3 +357,20 @@ export default async function StoryProfilePage({ params }: { params: { id: strin
     notFound()
   }
 }
+
+export async function generateStaticParams() {
+  try {
+    const storiesData = await fs.readFile(
+      path.join(process.cwd(), 'public/data/stories.json'),
+      'utf8'
+    )
+    const stories = JSON.parse(storiesData)
+    
+    return stories.map((story: Story) => ({
+      id: story.id,
+    }))
+  } catch (error) {
+    console.error('Error generating static params:', error)
+    return []
+  }
+}
