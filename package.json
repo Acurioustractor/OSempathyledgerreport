@@ -1,9 +1,11 @@
 {
-  "name": "root-redirect",
+  "name": "empathy-ledger-root",
   "version": "1.0.0",
+  "private": true,
   "scripts": {
-    "install": "cd empathy-ledger-showcase && npm install",
+    "postinstall": "cd empathy-ledger-showcase && npm install",
     "build": "cd empathy-ledger-showcase && npm run build",
-    "start": "cd empathy-ledger-showcase && npm start"
+    "start": "cd empathy-ledger-showcase && npm start",
+    "dev": "cd empathy-ledger-showcase && npm run dev"
   }
 }
