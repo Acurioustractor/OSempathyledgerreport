@@ -1,0 +1,9 @@
+{
+  "name": "root-redirect",
+  "version": "1.0.0",
+  "scripts": {
+    "install": "cd empathy-ledger-showcase && npm install",
+    "build": "cd empathy-ledger-showcase && npm run build",
+    "start": "cd empathy-ledger-showcase && npm start"
+  }
+}
