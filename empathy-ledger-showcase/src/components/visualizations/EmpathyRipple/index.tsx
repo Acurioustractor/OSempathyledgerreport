@@ -169,9 +169,9 @@ export function EmpathyRipple({
     <div className={`relative w-full h-full ${className}`}>
       <Canvas
         shadows
-        dpr={[1, quality === 'high' ? 2 : 1]}
+        dpr={quality === 'high' ? [1, 2] : [1, 1]}
         gl={{
-          antialias: quality !== 'low',
+          antialias: true,
           toneMapping: THREE.ACESFilmicToneMapping,
           toneMappingExposure: 0.8
         }}
@@ -227,7 +227,7 @@ export function EmpathyRipple({
           {/* Camera controls */}
           <OrbitControls
             enablePan={false}
-            enableZoom={quality !== 'low'}
+            enableZoom={true}
             maxPolarAngle={Math.PI / 2.5}
             minPolarAngle={Math.PI / 4}
             maxDistance={15}
@@ -235,7 +235,7 @@ export function EmpathyRipple({
           />
           
           {/* Post-processing effects */}
-          {quality !== 'low' && (
+          {quality === 'high' && (
             <EffectComposer>
               <Bloom
                 intensity={0.5}
@@ -244,7 +244,11 @@ export function EmpathyRipple({
               />
               {quality === 'high' && (
                 <>
-                  <ChromaticAberration offset={[0.0005, 0.0005]} />
+                  <ChromaticAberration 
+                    offset={new THREE.Vector2(0.0005, 0.0005)} 
+                    radialModulation={false}
+                    modulationOffset={0}
+                  />
                   <Vignette offset={0.3} darkness={0.4} />
                 </>
               )}

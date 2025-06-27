@@ -2,13 +2,21 @@ import WikiLayout from '@/components/wiki/WikiLayout'
 import Link from 'next/link'
 import Image from 'next/image'
 import { ArrowRight, Book, FileText, Users, Heart, Shield, Lightbulb } from 'lucide-react'
-import { getFeaturedStories } from '@/lib/airtable'
+import { promises as fs } from 'fs'
+import path from 'path'
 
 // Fetch featured stories
 async function getStoriesData() {
   try {
-    const stories = await getFeaturedStories(3)
-    return stories
+    const storiesPath = path.join(process.cwd(), 'public/data/stories.json')
+    const storiesData = await fs.readFile(storiesPath, 'utf8').then(data => JSON.parse(data))
+    
+    // Get featured stories (first 3 with featured flag or video)
+    const featuredStories = storiesData
+      .filter((story: any) => story.featured || story.hasVideo)
+      .slice(0, 3)
+      
+    return featuredStories
   } catch (error) {
     console.error('Error fetching stories:', error)
     return []
