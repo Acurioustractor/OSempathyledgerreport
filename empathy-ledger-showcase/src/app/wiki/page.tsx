@@ -215,11 +215,11 @@ export default async function WikiLandingPage() {
                 href={`/stories/${story.id}`}
                 className="group bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200 hover:shadow-lg transition-all"
               >
-                {story.fields['Profile Image'] && story.fields['Profile Image'][0] && (
+                {story.profileImage && (
                   <div className="relative h-48 overflow-hidden bg-gray-100">
                     <Image
-                      src={story.fields['Profile Image'][0].url}
-                      alt={story.fields['First Name'] || 'Storyteller'}
+                      src={story.profileImage}
+                      alt={story.storytellerNames?.[0] || 'Storyteller'}
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-300"
                     />
@@ -227,11 +227,11 @@ export default async function WikiLandingPage() {
                 )}
                 <div className="p-6">
                   <h3 className="font-semibold text-gray-900 mb-2 group-hover:text-orange-sky transition-colors">
-                    {story.fields['First Name']}'s Story
+                    {story.title || `${story.storytellerNames?.[0] || 'A Storyteller'}'s Story`}
                   </h3>
-                  {story.fields['Story Summary'] && (
+                  {story.excerpt && (
                     <p className="text-sm text-gray-600 line-clamp-3">
-                      {story.fields['Story Summary']}
+                      {story.excerpt}
                     </p>
                   )}
                   <div className="mt-4 flex items-center text-orange-sky opacity-0 group-hover:opacity-100 transition-opacity">

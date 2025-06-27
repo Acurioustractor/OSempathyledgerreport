@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { ArrowRight, Users, MapPin, Heart, BookOpen } from 'lucide-react'
 import MetricsCounter from '@/components/common/MetricsCounter'
 import FeaturedStories from '@/components/story/FeaturedStories'
-import { EmpathyRipple } from '@/components/visualizations/EmpathyRipple'
+import EmpathyRipple from '@/components/visualizations/EmpathyRippleWrapper'
 import PrivacyNotice from '@/components/privacy/PrivacyNotice'
 
 import { promises as fs } from 'fs'
@@ -218,8 +218,8 @@ export default async function HomePage() {
             <EmpathyRipple
               stories={featuredStories.map(story => ({
                 id: story.id,
-                title: story.fields['First Name'] ? `${story.fields['First Name']}'s Story` : 'A Story',
-                theme: story.fields['Primary Theme'] || 'Connection',
+                title: story.title || (story.storytellerNames?.[0] ? `${story.storytellerNames[0]}'s Story` : 'A Story'),
+                theme: story.themeIds?.[0] || 'Connection',
                 color: '#f97316',
                 x: Math.random(),
                 y: Math.random()
