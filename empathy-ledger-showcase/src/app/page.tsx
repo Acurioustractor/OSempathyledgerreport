@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { ArrowRight, Users, MapPin, Heart, BookOpen } from 'lucide-react'
 import MetricsCounter from '@/components/common/MetricsCounter'
 import FeaturedStories from '@/components/story/FeaturedStories'
-import ThemeConnectionNetwork from '@/components/visualizations/ThemeConnectionNetwork'
+import { EmpathyRipple } from '@/components/visualizations/EmpathyRipple'
 import PrivacyNotice from '@/components/privacy/PrivacyNotice'
 
 import { promises as fs } from 'fs'
@@ -196,21 +196,49 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Connection Visualization Section */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              The Power of Conversation
-            </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              See how themes of connection, support, and dignity weave through the experiences 
-              of volunteers, friends, and service providers – creating a tapestry of human understanding.
-            </p>
+      {/* Empathy Ripple Visualization Section */}
+      <section className="relative py-0 bg-gradient-to-b from-gray-50 via-gray-900 to-gray-900 overflow-hidden">
+        {/* Full-screen visualization container */}
+        <div className="relative h-screen">
+          {/* Content overlay */}
+          <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
+            <div className="text-center max-w-4xl mx-auto px-6">
+              <h2 className="text-5xl font-bold text-white mb-6 drop-shadow-lg animate-fade-in">
+                Every Story Creates Ripples of Change
+              </h2>
+              <p className="text-xl text-white/80 max-w-2xl mx-auto leading-relaxed drop-shadow animate-fade-in animation-delay-200">
+                Watch how individual stories of connection, support, and dignity spread outward, 
+                touching lives and creating waves of positive impact throughout the community.
+              </p>
+            </div>
           </div>
           
-          <div className="bg-white rounded-xl shadow-lg p-8">
-            <ThemeConnectionNetwork themes={topThemes} />
+          {/* The stunning visualization */}
+          <div className="absolute inset-0">
+            <EmpathyRipple
+              stories={featuredStories.map(story => ({
+                id: story.id,
+                title: story.fields['First Name'] ? `${story.fields['First Name']}'s Story` : 'A Story',
+                theme: story.fields['Primary Theme'] || 'Connection',
+                color: '#f97316',
+                x: Math.random(),
+                y: Math.random()
+              }))}
+              className="w-full h-full"
+              quality="high"
+              interactive={true}
+              showTutorial={true}
+            />
+          </div>
+          
+          {/* Scroll indicator */}
+          <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20 animate-bounce">
+            <div className="text-white/60 text-sm">
+              <p className="mb-2">Scroll to continue</p>
+              <svg className="w-6 h-6 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+              </svg>
+            </div>
           </div>
         </div>
       </section>

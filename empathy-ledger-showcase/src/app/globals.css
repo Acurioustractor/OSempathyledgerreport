@@ -145,6 +145,35 @@ select:focus {
   animation: countUp 0.8s ease-out;
 }
 
+/* Animation delays */
+.animation-delay-200 {
+  animation-delay: 200ms;
+}
+
+.animation-delay-400 {
+  animation-delay: 400ms;
+}
+
+.animation-delay-600 {
+  animation-delay: 600ms;
+}
+
+/* Empathy Ripple specific styles */
+.empathy-ripple-container {
+  background: radial-gradient(ellipse at center, #0a0f1b 0%, #000814 100%);
+}
+
+@keyframes ripple {
+  from {
+    opacity: 0.8;
+    transform: scale(0);
+  }
+  to {
+    opacity: 0;
+    transform: scale(4);
+  }
+}
+
 /* Card hover effects */
 .card-hover {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
