@@ -5,9 +5,10 @@ import { waterVertexShader, waterFragmentShader } from './shaders/waterShader'
 
 interface WaterPlaneProps {
   ripples: Array<{ x: number; y: number; radius: number; birthTime: number }>
+  mousePosition?: { x: number; y: number }
 }
 
-export function WaterPlane({ ripples }: WaterPlaneProps) {
+export function WaterPlane({ ripples, mousePosition = { x: 0.5, y: 0.5 } }: WaterPlaneProps) {
   const meshRef = useRef<THREE.Mesh>(null)
   const materialRef = useRef<THREE.ShaderMaterial>(null)
   const { size } = useThree()
@@ -51,10 +52,9 @@ export function WaterPlane({ ripples }: WaterPlaneProps) {
 
     materialRef.current.uniforms.uRipples.value = rippleArray
 
-    // Subtle mouse interaction
-    const mouse = state.mouse
-    materialRef.current.uniforms.uMouse.value.x = (mouse.x + 1) / 2
-    materialRef.current.uniforms.uMouse.value.y = (mouse.y + 1) / 2
+    // Update mouse position for water displacement
+    materialRef.current.uniforms.uMouse.value.x = mousePosition.x
+    materialRef.current.uniforms.uMouse.value.y = mousePosition.y
   })
 
   return (

@@ -37,6 +37,12 @@ export const waterVertexShader = `
     
     pos += wave1 + wave2 + wave3;
     
+    // Mouse interaction wave
+    float mouseDist = distance(uv, uMouse);
+    float mouseInfluence = smoothstep(0.3, 0.0, mouseDist);
+    float mouseWave = sin(mouseDist * 20.0 - uTime * 5.0) * mouseInfluence * 0.15;
+    pos.z += mouseWave;
+    
     // Interactive ripples
     float totalElevation = 0.0;
     

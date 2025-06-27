@@ -18,15 +18,22 @@ interface StoryDropProps {
 export function StoryDrop({ story, onImpact }: StoryDropProps) {
   const groupRef = useRef<THREE.Group>(null)
   const sphereRef = useRef<THREE.Mesh>(null)
+  const trailRef = useRef<THREE.Points>(null)
   const hasImpacted = useRef(false)
-  const startY = 5
+  const startY = 8
   const targetY = 0.1
-  const fallDuration = 2
+  const fallDuration = 5 // Slower fall
+  const startTime = useRef(0)
 
   useFrame((state) => {
     if (!groupRef.current || hasImpacted.current) return
 
-    const elapsed = state.clock.elapsedTime
+    // Initialize start time
+    if (startTime.current === 0) {
+      startTime.current = state.clock.elapsedTime
+    }
+
+    const elapsed = state.clock.elapsedTime - startTime.current
     const progress = Math.min(elapsed / fallDuration, 1)
     
     // Easing function for natural fall
@@ -56,8 +63,8 @@ export function StoryDrop({ story, onImpact }: StoryDropProps) {
   })
 
   return (
-    <group ref={groupRef} position={[story.x * 5 - 2.5, startY, story.y * 5 - 2.5]}>
-      <Sphere ref={sphereRef} args={[0.1, 32, 32]}>
+    <group ref={groupRef} position={[(story.x - 0.5) * 8, startY, (story.y - 0.5) * 8]}>
+      <Sphere ref={sphereRef} args={[0.3, 32, 32]}> {/* Larger sphere */}
         <meshStandardMaterial
           color={story.color}
           emissive={story.color}
@@ -67,23 +74,33 @@ export function StoryDrop({ story, onImpact }: StoryDropProps) {
         />
       </Sphere>
       
-      {/* Glow effect */}
+      {/* Enhanced glow effect */}
       <pointLight
         color={story.color}
-        intensity={2}
-        distance={1}
+        intensity={5}
+        distance={3}
       />
       
-      {/* Story label (appears on hover) */}
+      {/* Additional rim light */}
+      <Sphere args={[0.35, 32, 32]}>
+        <meshBasicMaterial
+          color={story.color}
+          transparent
+          opacity={0.3}
+        />
+      </Sphere>
+      
+      {/* Story label (always visible) */}
       <Text
-        position={[0, 0.3, 0]}
-        fontSize={0.15}
+        position={[0, 0.6, 0]}
+        fontSize={0.2}
         color="white"
         anchorX="center"
         anchorY="middle"
-        visible={false} // Toggle on hover
+        outlineWidth={0.02}
+        outlineColor="black"
       >
-        {story.title}
+        {story.theme}
       </Text>
     </group>
   )

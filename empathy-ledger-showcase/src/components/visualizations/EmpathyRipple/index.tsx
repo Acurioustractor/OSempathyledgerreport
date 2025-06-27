@@ -2,7 +2,7 @@
 
 import { useState, useRef, Suspense, useCallback, useEffect } from 'react'
 import { Canvas, useThree } from '@react-three/fiber'
-import { OrbitControls, PerspectiveCamera, Environment, Text, Float, Preload } from '@react-three/drei'
+import { PerspectiveCamera, Environment, Text, Float, Preload, OrbitControls } from '@react-three/drei'
 import { EffectComposer, Bloom, ChromaticAberration, Vignette } from '@react-three/postprocessing'
 import { WaterPlane } from './WaterPlane'
 import { StoryDrop } from './StoryDrop'
@@ -63,26 +63,48 @@ function Lighting() {
 }
 
 // Main scene component
-function Scene({ onAddRipple }: { onAddRipple: (x: number, y: number) => void }) {
-  const { camera, size } = useThree()
+function Scene({ onAddRipple, onMouseMove }: { 
+  onAddRipple: (x: number, y: number) => void
+  onMouseMove: (x: number, y: number) => void 
+}) {
+  const { camera, raycaster, mouse } = useThree()
+  const planeRef = useRef<THREE.Mesh>(null)
   
   const handlePointerDown = useCallback((event: any) => {
-    if (event.object.type === 'Mesh') {
-      const point = event.point
-      // Convert 3D coordinates to normalized coordinates
-      const x = (point.x + 5) / 10
-      const y = (point.z + 5) / 10
-      onAddRipple(x, y)
-    }
+    event.stopPropagation()
+    const point = event.point
+    // Convert 3D coordinates to normalized coordinates (0-1)
+    const x = (point.x + 5) / 10
+    const y = (point.z + 5) / 10
+    onAddRipple(x, y)
   }, [onAddRipple])
+
+  const handlePointerMove = useCallback((event: any) => {
+    if (planeRef.current) {
+      // Update raycaster
+      raycaster.setFromCamera(mouse, camera)
+      
+      // Create a plane at y=0
+      const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0)
+      const intersection = new THREE.Vector3()
+      
+      if (raycaster.ray.intersectPlane(plane, intersection)) {
+        // Convert world coordinates to normalized coordinates (0-1)
+        const x = (intersection.x + 5) / 10
+        const y = (intersection.z + 5) / 10
+        onMouseMove(x, y)
+      }
+    }
+  }, [camera, raycaster, mouse, onMouseMove])
 
   return (
     <>
       <mesh
-        position={[0, -0.5, 0]}
+        ref={planeRef}
+        position={[0, 0, 0]}
         rotation={[-Math.PI / 2, 0, 0]}
         onPointerDown={handlePointerDown}
-        visible={false}
+        onPointerMove={handlePointerMove}
       >
         <planeGeometry args={[10, 10]} />
         <meshBasicMaterial transparent opacity={0} />
@@ -101,8 +123,11 @@ export function EmpathyRipple({
   const [ripples, setRipples] = useState<Array<{ x: number; y: number; radius: number; birthTime: number }>>([])
   const [activeStories, setActiveStories] = useState<Story[]>([])
   const [hoveredStory, setHoveredStory] = useState<Story | null>(null)
+  const [impactedStories, setImpactedStories] = useState<Story[]>([])
   const [webGLSupported, setWebGLSupported] = useState(true)
+  const [mousePosition, setMousePosition] = useState({ x: 0.5, y: 0.5 })
   const timeRef = useRef(0)
+  const lastRippleTime = useRef(0)
 
   // Check WebGL support
   useEffect(() => {
@@ -127,26 +152,68 @@ export function EmpathyRipple({
   }, [])
 
   // Handle story impact
-  const handleStoryImpact = useCallback((x: number, y: number) => {
+  const handleStoryImpact = useCallback((x: number, y: number, story: Story) => {
     addRipple(x, y)
+    
+    // Add to impacted stories for display
+    setImpactedStories(prev => {
+      const newStories = [...prev, story]
+      // Keep only last 3 stories
+      return newStories.slice(-3)
+    })
+    
+    // Remove after 5 seconds
+    setTimeout(() => {
+      setImpactedStories(prev => prev.filter(s => s.id !== story.id))
+    }, 5000)
+  }, [addRipple])
+
+  // Handle mouse movement
+  const handleMouseMove = useCallback((x: number, y: number) => {
+    setMousePosition({ x, y })
+    
+    // Create ripples as mouse moves (throttled)
+    const currentTime = timeRef.current
+    if (currentTime - lastRippleTime.current > 0.1) { // Create ripple every 100ms
+      lastRippleTime.current = currentTime
+      addRipple(x, y)
+    }
   }, [addRipple])
 
   // Simulate story drops
   useEffect(() => {
+    // Drop a story immediately if we have any
+    if (stories.length > 0) {
+      const randomStory = stories[Math.floor(Math.random() * stories.length)]
+      const theme = THEMES.find(t => t.name === randomStory.theme) || THEMES[0]
+      
+      setActiveStories(prev => [...prev, {
+        ...randomStory,
+        id: `${randomStory.id}-${Date.now()}`,
+        color: theme.color,
+        x: Math.random(),
+        y: Math.random()
+      }])
+    }
+
     const interval = setInterval(() => {
-      if (stories.length > 0 && Math.random() > 0.7) {
+      if (stories.length > 0) {
         const randomStory = stories[Math.floor(Math.random() * stories.length)]
         const theme = THEMES.find(t => t.name === randomStory.theme) || THEMES[0]
         
-        setActiveStories(prev => [...prev, {
-          ...randomStory,
-          id: `${randomStory.id}-${Date.now()}`,
-          color: theme.color,
-          x: Math.random(),
-          y: Math.random()
-        }])
+        setActiveStories(prev => {
+          // Keep only last 5 stories to avoid performance issues
+          const newStories = [...prev, {
+            ...randomStory,
+            id: `${randomStory.id}-${Date.now()}`,
+            color: theme.color,
+            x: Math.random(),
+            y: Math.random()
+          }]
+          return newStories.slice(-5)
+        })
       }
-    }, 3000)
+    }, 2000) // Drop every 2 seconds
 
     return () => clearInterval(interval)
   }, [stories])
@@ -178,8 +245,9 @@ export function EmpathyRipple({
       >
         <PerspectiveCamera
           makeDefault
-          position={[0, 5, 8]}
-          fov={45}
+          position={[0, 10, 0]}
+          rotation={[-Math.PI / 2, 0, 0]}
+          fov={50}
           near={0.1}
           far={100}
         />
@@ -189,7 +257,7 @@ export function EmpathyRipple({
           <Environment preset="night" />
           
           {/* Water surface */}
-          <WaterPlane ripples={ripples} />
+          <WaterPlane ripples={ripples} mousePosition={mousePosition} />
           
           {/* Theme particles */}
           <ThemeParticles themes={THEMES} count={quality === 'high' ? 1000 : 500} />
@@ -199,12 +267,12 @@ export function EmpathyRipple({
             <StoryDrop
               key={story.id}
               story={story}
-              onImpact={handleStoryImpact}
+              onImpact={(x, y) => handleStoryImpact(x, y, story)}
             />
           ))}
           
           {/* Interactive layer */}
-          {interactive && <Scene onAddRipple={addRipple} />}
+          {interactive && <Scene onAddRipple={addRipple} onMouseMove={handleMouseMove} />}
           
           {/* Title text */}
           <Float
@@ -224,15 +292,7 @@ export function EmpathyRipple({
             </Text>
           </Float>
           
-          {/* Camera controls */}
-          <OrbitControls
-            enablePan={false}
-            enableZoom={true}
-            maxPolarAngle={Math.PI / 2.5}
-            minPolarAngle={Math.PI / 4}
-            maxDistance={15}
-            minDistance={5}
-          />
+          {/* Camera is fixed - no controls */}
           
           {/* Post-processing effects */}
           {quality === 'high' && (
@@ -268,18 +328,27 @@ export function EmpathyRipple({
         </div>
       )}
       
-      {/* Story info panel */}
-      {hoveredStory && (
-        <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg p-4 max-w-xs">
-          <h3 className="font-semibold text-gray-900 mb-2">{hoveredStory.title}</h3>
-          <span
-            className="inline-block px-2 py-1 text-xs font-medium text-white rounded"
-            style={{ backgroundColor: hoveredStory.color }}
+      {/* Story impact panels */}
+      <div className="absolute bottom-20 left-0 right-0 flex justify-center gap-4 px-4">
+        {impactedStories.map((story, index) => (
+          <div
+            key={story.id}
+            className="bg-black/80 backdrop-blur-sm rounded-lg shadow-xl p-4 max-w-sm animate-fade-in"
+            style={{
+              animation: 'fadeIn 0.5s ease-out',
+              animationDelay: `${index * 0.1}s`
+            }}
           >
-            {hoveredStory.theme}
-          </span>
-        </div>
-      )}
+            <h3 className="font-semibold text-white mb-2">{story.title}</h3>
+            <span
+              className="inline-block px-3 py-1 text-sm font-medium text-white rounded-full"
+              style={{ backgroundColor: story.color }}
+            >
+              {story.theme}
+            </span>
+          </div>
+        ))}
+      </div>
       
       {/* Performance monitor for development */}
       {process.env.NODE_ENV === 'development' && quality === 'high' && (
