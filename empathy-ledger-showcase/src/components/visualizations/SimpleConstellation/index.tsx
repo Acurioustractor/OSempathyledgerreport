@@ -47,6 +47,8 @@ export function SimpleConstellation({ storytellers = [], className = '' }: Simpl
     storytellers: Storyteller[]
     themes: Theme[]
   }>({ storytellers: [], themes: [] })
+  
+  console.log('SimpleConstellation received storytellers:', storytellers.length)
 
   // Process data
   useEffect(() => {
@@ -109,52 +111,80 @@ export function SimpleConstellation({ storytellers = [], className = '' }: Simpl
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
-    // Resize canvas
-    canvas.width = canvas.offsetWidth
-    canvas.height = canvas.offsetHeight
+    // Resize canvas to match display size
+    const rect = canvas.getBoundingClientRect()
+    canvas.width = rect.width
+    canvas.height = rect.height
 
     // Clear canvas
     ctx.fillStyle = '#111827'
     ctx.fillRect(0, 0, canvas.width, canvas.height)
+    
+    console.log('Drawing constellation:', processedData.storytellers.length, 'storytellers')
 
     // Draw connections
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)'
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)'
     ctx.lineWidth = 1
     processedData.storytellers.forEach((s1, i) => {
       processedData.storytellers.slice(i + 1).forEach((s2) => {
         const sharedThemes = s1.themes.filter(t => s2.themes.includes(t))
         if (sharedThemes.length > 0 && s1.x && s1.y && s2.x && s2.y) {
+          const x1 = (s1.x / 800) * canvas.width
+          const y1 = (s1.y / 600) * canvas.height
+          const x2 = (s2.x / 800) * canvas.width
+          const y2 = (s2.y / 600) * canvas.height
+          
           ctx.beginPath()
-          ctx.moveTo(s1.x, s1.y)
-          ctx.lineTo(s2.x, s2.y)
+          ctx.moveTo(x1, y1)
+          ctx.lineTo(x2, y2)
           ctx.stroke()
         }
       })
     })
 
     // Draw theme labels
-    ctx.font = '14px Arial'
+    ctx.font = '16px Arial'
     ctx.textAlign = 'center'
     processedData.themes.forEach((theme) => {
-      ctx.fillStyle = theme.color + '80' // Semi-transparent
-      ctx.fillText(theme.name, theme.x, theme.y - 20)
+      const x = (theme.x / 800) * canvas.width
+      const y = (theme.y / 600) * canvas.height
+      ctx.fillStyle = theme.color + 'CC' // Semi-transparent
+      ctx.fillText(theme.name, x, y - 20)
     })
 
+    // Draw background stars
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.3)'
+    for (let i = 0; i < 100; i++) {
+      const x = Math.random() * canvas.width
+      const y = Math.random() * canvas.height
+      const size = Math.random() * 2
+      ctx.beginPath()
+      ctx.arc(x, y, size, 0, Math.PI * 2)
+      ctx.fill()
+    }
+    
     // Draw storyteller stars
     processedData.storytellers.forEach((storyteller) => {
       if (!storyteller.x || !storyteller.y) return
       
+      // Scale positions to canvas size
+      const x = (storyteller.x / 800) * canvas.width
+      const y = (storyteller.y / 600) * canvas.height
+      
       // Star glow
-      const gradient = ctx.createRadialGradient(storyteller.x, storyteller.y, 0, storyteller.x, storyteller.y, 10)
-      gradient.addColorStop(0, ROLE_COLORS[storyteller.role])
+      const gradient = ctx.createRadialGradient(x, y, 0, x, y, 15)
+      gradient.addColorStop(0, ROLE_COLORS[storyteller.role] + 'FF')
+      gradient.addColorStop(0.5, ROLE_COLORS[storyteller.role] + '80')
       gradient.addColorStop(1, 'transparent')
       ctx.fillStyle = gradient
-      ctx.fillRect(storyteller.x - 10, storyteller.y - 10, 20, 20)
+      ctx.beginPath()
+      ctx.arc(x, y, 15, 0, Math.PI * 2)
+      ctx.fill()
       
       // Star center
       ctx.fillStyle = ROLE_COLORS[storyteller.role]
       ctx.beginPath()
-      ctx.arc(storyteller.x, storyteller.y, 3, 0, Math.PI * 2)
+      ctx.arc(x, y, 4, 0, Math.PI * 2)
       ctx.fill()
     })
 

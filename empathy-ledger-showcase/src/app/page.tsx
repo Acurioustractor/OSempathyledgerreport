@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { ArrowRight, Users, MapPin, Heart, BookOpen } from 'lucide-react'
 import MetricsCounter from '@/components/common/MetricsCounter'
 import FeaturedStories from '@/components/story/FeaturedStories'
-import SimpleConstellation from '@/components/visualizations/SimpleConstellationWrapper'
+import { TestConstellation } from '@/components/visualizations/TestConstellation'
 import PrivacyNotice from '@/components/privacy/PrivacyNotice'
 
 import { promises as fs } from 'fs'
@@ -249,8 +249,7 @@ export default async function HomePage() {
           
           {/* The constellation visualization */}
           <div className="absolute inset-0">
-            <SimpleConstellation
-              storytellers={processedStorytellers}
+            <TestConstellation
               className="w-full h-full"
             />
           </div>
