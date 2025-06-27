@@ -1,5 +1,4 @@
-import Link from 'next/link'
-import { ArrowLeft } from 'lucide-react'
+import WikiLayout from '@/components/wiki/WikiLayout'
 import WikiContentRenderer from '@/components/wiki/WikiContentRenderer'
 import { WikiSection } from '@/data/wiki-content'
 
@@ -161,51 +160,40 @@ const mySection: WikiSection = {
 ]
 
 export default function ContentGuidePage() {
-  return (
-    <div className="wiki-container">
-      {/* Header */}
-      <section className="wiki-header">
-        <div className="wiki-header-content">
-          <Link
-            href="/wiki"
-            className="wiki-back-link"
-          >
-            <ArrowLeft className="w-4 h-4 mr-1" />
-            Back to Documentation
-          </Link>
-          <h1 className="wiki-title">
-            Wiki Content Guide
-          </h1>
-        </div>
-      </section>
+  const content = (
+    <>
+      {/* Page Introduction */}
+      <div className="bg-gradient-to-br from-blue-50 to-white rounded-2xl p-8 mb-12">
+        <h1 className="text-4xl font-bold text-gray-900 mb-4">Wiki Content Guide</h1>
+        <p className="text-xl text-gray-600">
+          This page demonstrates all the different content types you can use in the wiki. 
+          Simply copy these examples to add your own content!
+        </p>
+      </div>
 
-      {/* Content */}
-      <section className="wiki-content">
-        <div className="wiki-content-wrapper">
-          <div className="wiki-layout">
-            {/* Fixed Sidebar */}
-            <aside className="wiki-sidebar">
-              <div className="wiki-sidebar-sticky">
-                <nav className="space-y-2">
-                  <h3 className="font-semibold text-sm text-gray-900 mb-4">Content Types</h3>
-                  <a href="#text-content" className="block text-sm text-gray-600 hover:text-orange-sky">Text Content</a>
-                  <a href="#video-example" className="block text-sm text-gray-600 hover:text-orange-sky">Videos</a>
-                  <a href="#callout-examples" className="block text-sm text-gray-600 hover:text-orange-sky">Callouts</a>
-                  <a href="#list-examples" className="block text-sm text-gray-600 hover:text-orange-sky">Lists</a>
-                  <a href="#grid-example" className="block text-sm text-gray-600 hover:text-orange-sky">Grids</a>
-                  <a href="#code-example" className="block text-sm text-gray-600 hover:text-orange-sky">Code Blocks</a>
-                  <a href="#table-example" className="block text-sm text-gray-600 hover:text-orange-sky">Tables</a>
-                </nav>
-              </div>
-            </aside>
-            
-            {/* Main content */}
-            <article className="flex-1 max-w-4xl">
-              <WikiContentRenderer sections={contentGuideContent} />
-            </article>
-          </div>
+      {/* Quick Navigation */}
+      <div className="bg-gray-50 rounded-xl p-6 mb-12">
+        <h2 className="font-semibold text-gray-900 mb-4">Quick Navigation</h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <a href="#text-content" className="text-sm text-gray-600 hover:text-orange-sky">Text Content</a>
+          <a href="#video-example" className="text-sm text-gray-600 hover:text-orange-sky">Videos</a>
+          <a href="#callout-examples" className="text-sm text-gray-600 hover:text-orange-sky">Callouts</a>
+          <a href="#list-examples" className="text-sm text-gray-600 hover:text-orange-sky">Lists</a>
+          <a href="#grid-example" className="text-sm text-gray-600 hover:text-orange-sky">Grids</a>
+          <a href="#code-example" className="text-sm text-gray-600 hover:text-orange-sky">Code Blocks</a>
+          <a href="#table-example" className="text-sm text-gray-600 hover:text-orange-sky">Tables</a>
+          <a href="#adding-content" className="text-sm text-gray-600 hover:text-orange-sky">How to Add Content</a>
         </div>
-      </section>
-    </div>
+      </div>
+
+      {/* Render all content sections */}
+      <WikiContentRenderer sections={contentGuideContent} />
+    </>
+  )
+
+  return (
+    <WikiLayout currentSlug="content-guide" pageTitle="Wiki Content Guide">
+      {content}
+    </WikiLayout>
   )
 }
