@@ -37,12 +37,55 @@ const ROLE_COLORS = {
   'service-provider': '#32CD32' // Lime Green
 }
 
-// Theme colors - galaxy-like
-const THEME_COLORS = [
-  '#FF1493', '#FF6347', '#FFD700', '#00CED1', '#7B68EE', 
-  '#32CD32', '#FF69B4', '#1E90FF', '#FF4500', '#9370DB',
-  '#00FA9A', '#DC143C', '#4682B4', '#FFB6C1', '#20B2AA'
-]
+// Theme groups for better visualization and analysis
+const THEME_GROUPS = {
+  'Volunteering & Service': {
+    keywords: ['Volunteering', 'Volunteer', 'Community Service', 'Community Engagement', 'Volunteerism', 'Orange Sky'],
+    color: '#FF6347' // Orange-red
+  },
+  'Personal Journey': {
+    keywords: ['Personal Background', 'Personal', 'Introduction', 'Career', 'Transformation', 'Life'],
+    color: '#7B68EE' // Medium slate blue
+  },
+  'Community & Connection': {
+    keywords: ['Community', 'Friendship', 'Connection', 'Relationships', 'Social'],
+    color: '#32CD32' // Lime green
+  },
+  'Social Issues': {
+    keywords: ['Homelessness', 'Struggles', 'Assistance', 'Support Services', 'Crisis'],
+    color: '#FF1493' // Deep pink
+  },
+  'Faith & Values': {
+    keywords: ['Faith', 'Spirituality', 'Values', 'Compassion', 'Giving'],
+    color: '#FFD700' // Gold
+  },
+  'Work & Retirement': {
+    keywords: ['Profession', 'Work', 'Employment', 'Retirement', 'Career'],
+    color: '#00CED1' // Dark turquoise
+  },
+  'Youth & Education': {
+    keywords: ['Youth', 'Education', 'Learning', 'Development'],
+    color: '#9370DB' // Medium purple
+  },
+  'COVID Impact': {
+    keywords: ['COVID', 'Pandemic', 'Impact'],
+    color: '#DC143C' // Crimson
+  }
+}
+
+// Function to categorize a theme into a group
+function categorizeTheme(themeName: string): { group: string, color: string } {
+  const theme = themeName.toLowerCase()
+  
+  for (const [groupName, groupData] of Object.entries(THEME_GROUPS)) {
+    if (groupData.keywords.some(keyword => theme.includes(keyword.toLowerCase()))) {
+      return { group: groupName, color: groupData.color }
+    }
+  }
+  
+  // Default group for uncategorized themes
+  return { group: 'Other', color: '#20B2AA' } // Light sea green
+}
 
 export function DynamicConstellation({ storytellers = [], className = '' }: DynamicConstellationProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -64,41 +107,47 @@ export function DynamicConstellation({ storytellers = [], className = '' }: Dyna
       return
     }
 
-    // Create theme map
-    const themeMap = new Map<string, { count: number, storytellers: Set<string> }>()
+    // Create theme group map instead of individual themes
+    const themeGroupMap = new Map<string, { count: number, storytellers: Set<string>, themes: Set<string> }>()
     
     storytellers.forEach(st => {
       st.themes?.forEach(theme => {
-        if (!themeMap.has(theme)) {
-          themeMap.set(theme, { count: 0, storytellers: new Set() })
+        const { group, color } = categorizeTheme(theme)
+        
+        if (!themeGroupMap.has(group)) {
+          themeGroupMap.set(group, { count: 0, storytellers: new Set(), themes: new Set() })
         }
-        const data = themeMap.get(theme)!
+        const data = themeGroupMap.get(group)!
         data.count++
         data.storytellers.add(st.id)
+        data.themes.add(theme)
       })
     })
 
-    // Create theme positions in a spiral pattern to fit more themes
-    const themeArray = Array.from(themeMap.entries())
+    // Create theme group positions in a spiral pattern
+    const themeArray = Array.from(themeGroupMap.entries())
       .sort((a, b) => b[1].count - a[1].count)
 
     const centerX = 400
     const centerY = 300
     
-    // Spiral layout for themes
-    const processedThemes = themeArray.map(([ name, data ], i) => {
-      const spiralRadius = 100 + (i * 15)
-      const angle = (i * 0.5) // More spread out spiral
+    // Spiral layout for theme groups with larger spacing
+    const processedThemes = themeArray.map(([ groupName, data ], i) => {
+      const spiralRadius = 120 + (i * 80) // Larger spacing between groups
+      const angle = (i * 1.2) // More spread out spiral
       const x = centerX + Math.cos(angle) * spiralRadius
       const y = centerY + Math.sin(angle) * spiralRadius
       
+      const { color } = categorizeTheme(Array.from(data.themes)[0]) // Get color from first theme in group
+      
       return {
-        id: name.toLowerCase().replace(/\s+/g, '-'),
-        name,
-        x: Math.max(50, Math.min(750, x)), // Keep within bounds
-        y: Math.max(50, Math.min(550, y)),
+        id: groupName.toLowerCase().replace(/\s+/g, '-'),
+        name: groupName,
+        x: Math.max(80, Math.min(720, x)), // Keep within bounds with more margin
+        y: Math.max(80, Math.min(520, y)),
         count: data.count,
-        color: THEME_COLORS[i % THEME_COLORS.length]
+        color: color,
+        themeCount: data.themes.size
       }
     })
 
@@ -109,15 +158,20 @@ export function DynamicConstellation({ storytellers = [], className = '' }: Dyna
       let y = Math.random() * 600
       
       if (st.themes && st.themes.length > 0) {
+        // Find theme groups this storyteller belongs to
+        const storytellerGroups = st.themes.map(theme => categorizeTheme(theme).group)
+        const uniqueGroups = Array.from(new Set(storytellerGroups))
+        
         const relevantThemes = processedThemes.filter(t => 
-          st.themes.includes(t.name)
+          uniqueGroups.includes(t.name)
         )
+        
         if (relevantThemes.length > 0) {
           x = relevantThemes.reduce((sum, t) => sum + t.x, 0) / relevantThemes.length
           y = relevantThemes.reduce((sum, t) => sum + t.y, 0) / relevantThemes.length
-          // Add some randomness
-          x += (Math.random() - 0.5) * 100
-          y += (Math.random() - 0.5) * 100
+          // Add some randomness but keep closer to theme groups
+          x += (Math.random() - 0.5) * 60
+          y += (Math.random() - 0.5) * 60
         }
       }
 
@@ -168,19 +222,34 @@ export function DynamicConstellation({ storytellers = [], className = '' }: Dyna
           fy += (dy / distance) * force
         }
 
-        // Attraction to theme centers
+        // Attraction to theme group centers
         if (selectedTheme) {
-          if (node.themes.includes(selectedTheme)) {
+          // Find if this node belongs to the selected theme group
+          const nodeGroups = node.themes.map(theme => categorizeTheme(theme).group)
+          if (nodeGroups.includes(selectedTheme)) {
             const theme = themes.find(t => t.name === selectedTheme)
             if (theme) {
               const dx = theme.x - node.x
               const dy = theme.y - node.y
-              const distance = Math.sqrt(dx * dx + dy * dy)
               fx += dx * 0.01
               fy += dy * 0.01
             }
           }
         } else {
+          // Gentle attraction to relevant theme groups
+          const nodeGroups = node.themes.map(theme => categorizeTheme(theme).group)
+          const uniqueGroups = Array.from(new Set(nodeGroups))
+          
+          uniqueGroups.forEach(groupName => {
+            const theme = themes.find(t => t.name === groupName)
+            if (theme) {
+              const dx = theme.x - node.x
+              const dy = theme.y - node.y
+              fx += dx * 0.0005
+              fy += dy * 0.0005
+            }
+          })
+          
           // Gentle center gravity
           fx += (400 - node.x) * 0.0001
           fy += (300 - node.y) * 0.0001
@@ -237,42 +306,86 @@ export function DynamicConstellation({ storytellers = [], className = '' }: Dyna
         ctx.fill()
       }
 
-      // Draw theme labels (galaxies)
+      // Draw theme areas (galaxies) with shared relationship intensity
       themes.forEach(theme => {
         const x = theme.x * scaleX
         const y = theme.y * scaleY
         
-        // Galaxy glow
-        const gradient = ctx.createRadialGradient(x, y, 0, x, y, 60)
-        gradient.addColorStop(0, theme.color + '40')
-        gradient.addColorStop(0.5, theme.color + '20')
+        // Calculate how many roles this theme group appears in
+        const roleGroups: Record<string, Set<string>> = {
+          volunteer: new Set(),
+          friend: new Set(),
+          'service-provider': new Set()
+        }
+        
+        nodes.forEach(node => {
+          node.themes.forEach(t => {
+            const { group } = categorizeTheme(t)
+            if (group === theme.name) {
+              roleGroups[node.role].add(group)
+            }
+          })
+        })
+        
+        const roleCount = [roleGroups.volunteer.has(theme.name), roleGroups.friend.has(theme.name), roleGroups['service-provider'].has(theme.name)].filter(Boolean).length
+        
+        // Intensity based on how shared the theme group is
+        const baseIntensity = Math.min(roleCount * 0.15, 0.4) // More intense if shared across more roles
+        const selectedIntensity = selectedTheme === theme.name ? 0.6 : baseIntensity
+        
+        // Larger radius for more shared themes
+        const radius = 30 + (roleCount * 15)
+        
+        // Enhanced glow for shared themes
+        const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius)
+        gradient.addColorStop(0, theme.color + Math.floor(selectedIntensity * 255).toString(16).padStart(2, '0'))
+        gradient.addColorStop(0.5, theme.color + Math.floor(selectedIntensity * 0.5 * 255).toString(16).padStart(2, '0'))
         gradient.addColorStop(1, 'transparent')
         ctx.fillStyle = gradient
         ctx.beginPath()
-        ctx.arc(x, y, 60, 0, Math.PI * 2)
+        ctx.arc(x, y, radius, 0, Math.PI * 2)
         ctx.fill()
-
-        // Theme name
-        ctx.fillStyle = selectedTheme === theme.name ? theme.color : theme.color + '99'
-        ctx.font = selectedTheme === theme.name ? 'bold 14px Arial' : '12px Arial'
-        ctx.textAlign = 'center'
-        ctx.fillText(theme.name, x, y)
-        ctx.font = '10px Arial'
-        ctx.fillStyle = theme.color + '66'
-        ctx.fillText(`(${theme.count})`, x, y + 15)
+        
+        // Add pulse effect for highly shared themes
+        if (roleCount >= 2) {
+          const pulseRadius = radius + Math.sin(Date.now() * 0.003) * 10
+          const pulseGradient = ctx.createRadialGradient(x, y, radius * 0.8, x, y, pulseRadius)
+          pulseGradient.addColorStop(0, 'transparent')
+          pulseGradient.addColorStop(1, theme.color + '20')
+          ctx.fillStyle = pulseGradient
+          ctx.beginPath()
+          ctx.arc(x, y, pulseRadius, 0, Math.PI * 2)
+          ctx.fill()
+        }
       })
 
-      // Draw connections
+      // Draw connections based on shared theme groups
       nodes.forEach((node, i) => {
         nodes.slice(i + 1).forEach(other => {
-          const sharedThemes = node.themes.filter(t => other.themes.includes(t))
-          if (sharedThemes.length > 0) {
-            const opacity = selectedTheme 
-              ? (sharedThemes.includes(selectedTheme) ? 0.6 : 0.1)
-              : Math.min(0.2 * sharedThemes.length, 0.6)
+          // Get theme groups for each node
+          const nodeGroups = node.themes.map(theme => categorizeTheme(theme).group)
+          const otherGroups = other.themes.map(theme => categorizeTheme(theme).group)
+          
+          // Find shared groups
+          const sharedGroups = nodeGroups.filter(group => otherGroups.includes(group))
+          
+          if (sharedGroups.length > 0) {
+            // Use the color of the most prominent shared group
+            const primaryGroup = sharedGroups[0]
+            const groupColor = categorizeTheme(node.themes.find(t => categorizeTheme(t).group === primaryGroup) || '').color
             
-            ctx.strokeStyle = `rgba(255, 255, 255, ${opacity})`
-            ctx.lineWidth = Math.min(sharedThemes.length, 3)
+            const opacity = selectedTheme 
+              ? (sharedGroups.includes(selectedTheme) ? 0.8 : 0.1)
+              : Math.min(0.3 * sharedGroups.length, 0.7)
+            
+            // Convert hex color to RGB for opacity
+            const hex = groupColor.replace('#', '')
+            const r = parseInt(hex.substr(0, 2), 16)
+            const g = parseInt(hex.substr(2, 2), 16)
+            const b = parseInt(hex.substr(4, 2), 16)
+            
+            ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${opacity})`
+            ctx.lineWidth = Math.min(sharedGroups.length * 1.5, 4)
             ctx.beginPath()
             ctx.moveTo(node.x * scaleX, node.y * scaleY)
             ctx.lineTo(other.x * scaleX, other.y * scaleY)
@@ -285,25 +398,51 @@ export function DynamicConstellation({ storytellers = [], className = '' }: Dyna
       nodes.forEach(node => {
         const x = node.x * scaleX
         const y = node.y * scaleY
-        const isHighlighted = !selectedTheme || node.themes.includes(selectedTheme)
+        // Check if node belongs to selected theme group
+        const nodeGroups = node.themes.map(theme => categorizeTheme(theme).group)
+        const isHighlighted = !selectedTheme || nodeGroups.includes(selectedTheme)
         const size = hoveredNode?.id === node.id ? 8 : 5
         
+        // Calculate connection intensity for this node
+        const connectionCount = nodes.filter(other => {
+          if (other.id === node.id) return false
+          const otherGroups = other.themes.map(theme => categorizeTheme(theme).group)
+          return nodeGroups.some(group => otherGroups.includes(group))
+        }).length
+        
+        // Enhanced glow based on connections and role
+        const connectionIntensity = Math.min(connectionCount * 0.1, 0.8)
+        const glowSize = size * (3 + connectionIntensity * 2)
+        
         // Star glow
-        const gradient = ctx.createRadialGradient(x, y, 0, x, y, size * 3)
+        const gradient = ctx.createRadialGradient(x, y, 0, x, y, glowSize)
         const color = ROLE_COLORS[node.role]
-        gradient.addColorStop(0, isHighlighted ? color : color + '40')
-        gradient.addColorStop(0.4, isHighlighted ? color + '80' : color + '20')
+        const baseOpacity = isHighlighted ? '80' : '40'
+        const glowOpacity = isHighlighted ? Math.floor((0.8 + connectionIntensity * 0.4) * 255).toString(16).padStart(2, '0') : '20'
+        
+        gradient.addColorStop(0, color + glowOpacity)
+        gradient.addColorStop(0.4, color + baseOpacity)
         gradient.addColorStop(1, 'transparent')
         ctx.fillStyle = gradient
         ctx.beginPath()
-        ctx.arc(x, y, size * 3, 0, Math.PI * 2)
+        ctx.arc(x, y, glowSize, 0, Math.PI * 2)
         ctx.fill()
 
-        // Star core
+        // Star core with connection-based sizing
+        const coreSize = size + (connectionIntensity * 2)
         ctx.fillStyle = isHighlighted ? color : color + '60'
         ctx.beginPath()
-        ctx.arc(x, y, size, 0, Math.PI * 2)
+        ctx.arc(x, y, coreSize, 0, Math.PI * 2)
         ctx.fill()
+        
+        // Add subtle ring for highly connected nodes
+        if (connectionCount > 3) {
+          ctx.strokeStyle = color + '60'
+          ctx.lineWidth = 1
+          ctx.beginPath()
+          ctx.arc(x, y, coreSize + 3, 0, Math.PI * 2)
+          ctx.stroke()
+        }
       })
 
       // Draw hover info
@@ -318,13 +457,16 @@ export function DynamicConstellation({ storytellers = [], className = '' }: Dyna
         const roleWidth = ctx.measureText(roleText).width
         
         ctx.font = '11px Arial'
-        const themes = hoveredNode.themes.slice(0, 2)
-        const maxThemeWidth = Math.max(...themes.map(t => ctx.measureText(t).width))
+        // Show theme groups instead of individual themes
+        const nodeGroups = hoveredNode.themes.map(theme => categorizeTheme(theme).group)
+        const uniqueGroups = Array.from(new Set(nodeGroups)).slice(0, 2)
+        const maxThemeWidth = Math.max(...uniqueGroups.map(g => ctx.measureText(g).width))
         
         const padding = 15
         const boxWidth = Math.max(roleWidth, maxThemeWidth) + padding * 2
         const lineHeight = 18
-        const boxHeight = padding * 2 + lineHeight * (1 + Math.min(themes.length, 2) + (hoveredNode.themes.length > 2 ? 1 : 0))
+        const totalGroups = Array.from(new Set(hoveredNode.themes.map(theme => categorizeTheme(theme).group))).length
+        const boxHeight = padding * 2 + lineHeight * (1 + Math.min(uniqueGroups.length, 2) + (totalGroups > 2 ? 1 : 0))
         
         // Position box above node
         const boxX = x - boxWidth / 2
@@ -347,13 +489,13 @@ export function DynamicConstellation({ storytellers = [], className = '' }: Dyna
         
         ctx.font = '11px Arial'
         ctx.fillStyle = '#ddd'
-        themes.forEach((theme, i) => {
-          ctx.fillText(theme, x, boxY + padding + 14 + (i + 1) * lineHeight)
+        uniqueGroups.forEach((group, i) => {
+          ctx.fillText(group, x, boxY + padding + 14 + (i + 1) * lineHeight)
         })
         
-        if (hoveredNode.themes.length > 2) {
+        if (totalGroups > 2) {
           ctx.fillStyle = '#999'
-          ctx.fillText(`+${hoveredNode.themes.length - 2} more themes`, x, boxY + padding + 14 + 3 * lineHeight)
+          ctx.fillText(`+${totalGroups - 2} more groups`, x, boxY + padding + 14 + 3 * lineHeight)
         }
       }
 
@@ -427,9 +569,9 @@ export function DynamicConstellation({ storytellers = [], className = '' }: Dyna
     setDraggedNode(null)
   }, [draggedNode])
 
-  // Calculate crossover metrics
+  // Calculate crossover metrics - theme groups shared between at least 2 roles
   const calculateCrossover = () => {
-    const roleThemes: Record<string, Set<string>> = {
+    const roleGroups: Record<string, Set<string>> = {
       volunteer: new Set(),
       friend: new Set(),
       'service-provider': new Set()
@@ -437,15 +579,32 @@ export function DynamicConstellation({ storytellers = [], className = '' }: Dyna
     
     nodes.forEach(node => {
       node.themes.forEach(theme => {
-        roleThemes[node.role].add(theme)
+        const { group } = categorizeTheme(theme)
+        roleGroups[node.role].add(group)
       })
     })
     
-    // Themes shared across all three roles
-    const allRolesThemes = Array.from(roleThemes.volunteer)
-      .filter(theme => roleThemes.friend.has(theme) && roleThemes['service-provider'].has(theme))
+    // Get all unique theme groups
+    const allGroups = new Set([
+      ...Array.from(roleGroups.volunteer),
+      ...Array.from(roleGroups.friend),
+      ...Array.from(roleGroups['service-provider'])
+    ])
     
-    return allRolesThemes.length
+    // Count theme groups that appear in at least 2 roles
+    let sharedGroups = 0
+    allGroups.forEach(group => {
+      let roleCount = 0
+      if (roleGroups.volunteer.has(group)) roleCount++
+      if (roleGroups.friend.has(group)) roleCount++
+      if (roleGroups['service-provider'].has(group)) roleCount++
+      
+      if (roleCount >= 2) {
+        sharedGroups++
+      }
+    })
+    
+    return sharedGroups
   }
 
   // Get unique locations count from storytellers prop
@@ -485,7 +644,7 @@ export function DynamicConstellation({ storytellers = [], className = '' }: Dyna
       </div>
 
       {/* Metrics Bar */}
-      <div className="absolute bottom-0 left-0 right-0 bg-black/90 backdrop-blur-sm border-t border-white/10 z-10">
+      <div className="absolute bottom-0 left-0 right-0 bg-black/90 backdrop-blur-sm border-t border-white/10 z-20">
         <div className="max-w-6xl mx-auto px-6 py-4">
           <div className="grid grid-cols-5 gap-6 text-center">
             <div>
@@ -506,8 +665,8 @@ export function DynamicConstellation({ storytellers = [], className = '' }: Dyna
             </div>
             <div>
               <div className="text-2xl font-bold text-white">{calculateCrossover()}</div>
-              <div className="text-xs text-white/60">Shared Themes</div>
-              <div className="text-xs text-white/40 mt-1">across all roles</div>
+              <div className="text-xs text-white/60">Shared Groups</div>
+              <div className="text-xs text-white/40 mt-1">across roles</div>
             </div>
           </div>
         </div>

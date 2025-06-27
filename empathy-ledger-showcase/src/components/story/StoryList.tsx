@@ -22,10 +22,11 @@ export default function StoryList({ story }: StoryListProps) {
               <div className="relative w-32 h-32 rounded-lg overflow-hidden">
                 <Image
                   src={story.image.thumbnails?.small?.url || story.image.url}
-                  alt={story.title}
+                  alt={story.title || 'Story image'}
                   fill
                   className="object-cover"
                   onError={() => setImageError(true)}
+                  unoptimized={true}
                 />
                 {story.hasVideo && (
                   <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30">

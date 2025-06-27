@@ -20,10 +20,11 @@ export default function StoryCard({ story }: StoryCardProps) {
           <div className="relative h-48 w-full">
             <Image
               src={story.image?.url || story.profileImage || ''}
-              alt={story.title}
+              alt={story.title || 'Story image'}
               fill
               className="object-cover"
               onError={() => setImageError(true)}
+              unoptimized={true}
             />
             {story.hasVideo && (
               <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30">

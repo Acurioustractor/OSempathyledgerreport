@@ -31,11 +31,12 @@ export default function StorytellerCard({ storyteller }: StorytellerCardProps) {
               <div className="relative w-16 h-16 rounded-full overflow-hidden">
                 <Image
                   src={storyteller.profileImage}
-                  alt={storyteller.name}
+                  alt={storyteller.name || 'Storyteller'}
                   fill
                   className="object-cover"
                   sizes="64px"
                   onError={() => setImageError(true)}
+                  unoptimized={true}
                 />
               </div>
             ) : (

@@ -37,12 +37,13 @@ const FeaturedStories = ({ stories }: FeaturedStoriesProps) => {
             <div className="relative h-48 w-full">
               <Image
                 src={story.image?.url || story.profileImage || ''}
-                alt={story.title}
+                alt={story.title || 'Story image'}
                 fill
                 className="object-cover"
                 onError={() => {
                   setImageErrors(prev => ({ ...prev, [story.id]: true }))
                 }}
+                unoptimized={true}
               />
               {story.hasVideo && (
                 <div className="absolute top-4 right-4">
