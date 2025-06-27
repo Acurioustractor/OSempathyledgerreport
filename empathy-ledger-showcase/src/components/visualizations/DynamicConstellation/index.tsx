@@ -55,9 +55,14 @@ export function DynamicConstellation({ storytellers = [], className = '' }: Dyna
   const [draggedNode, setDraggedNode] = useState<Node | null>(null)
   const mouseRef = useRef({ x: 0, y: 0 })
 
+  console.log('DynamicConstellation received storytellers:', storytellers.length)
+
   // Initialize nodes and themes
   useEffect(() => {
-    if (storytellers.length === 0) return
+    if (storytellers.length === 0) {
+      console.log('No storytellers received')
+      return
+    }
 
     // Create theme map
     const themeMap = new Map<string, { count: number, storytellers: Set<string> }>()
@@ -119,8 +124,8 @@ export function DynamicConstellation({ storytellers = [], className = '' }: Dyna
         y,
         vx: 0,
         vy: 0,
-        role: st.role === 'volunteer' ? 'volunteer' : 
-              st.role === 'service provider' ? 'service-provider' : 'friend',
+        role: (st.role === 'volunteer' ? 'volunteer' : 
+              st.role === 'service provider' ? 'service-provider' : 'friend') as 'volunteer' | 'friend' | 'service-provider',
         themes: st.themes || []
       }
     })

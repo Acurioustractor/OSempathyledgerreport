@@ -127,36 +127,15 @@ export default async function HomePage() {
     .filter((story: any) => story.featured || story.hasVideo)
     .slice(0, 3)
 
-  // Process storytellers from storytellers data with theme names
-  const storytellerMap = new Map()
-  
-  // First create map from storyteller data
-  ;(storytellersData as any[]).forEach((storyteller: any) => {
-    storytellerMap.set(storyteller.id, {
-      id: storyteller.id,
-      name: storyteller.name,
-      role: storyteller.role === 'volunteer' ? 'volunteer' : 
-            storyteller.role === 'service provider' ? 'service-provider' : 'friend',
-      themes: [],
-      location: storyteller.location || 'Unknown'
-    })
-  })
-  
-  // Then add theme names from stories
-  ;(storiesData as any[]).forEach((story: any) => {
-    if (story.storytellerIds && story.storytellerIds.length > 0) {
-      story.storytellerIds.forEach((id: string) => {
-        if (storytellerMap.has(id) && story.themeNames) {
-          const existing = storytellerMap.get(id)
-          const mergedThemes = Array.from(new Set([...existing.themes, ...story.themeNames]))
-          storytellerMap.set(id, { ...existing, themes: mergedThemes })
-        }
-      })
-    }
-  })
-  
-  const processedStorytellers = Array.from(storytellerMap.values())
-    .filter(storyteller => storyteller.themes.length > 0)
+  // Process storytellers - they already have themes!
+  const processedStorytellers = (storytellersData as any[]).map((storyteller: any) => ({
+    id: storyteller.id,
+    name: storyteller.name,
+    role: storyteller.role === 'volunteer' ? 'volunteer' : 
+          storyteller.role === 'service provider' ? 'service-provider' : 'friend',
+    themes: storyteller.themes || [],
+    location: storyteller.location || 'Unknown'
+  })).filter(storyteller => storyteller.themes.length > 0)
 
   return (
     <div className="min-h-screen">
