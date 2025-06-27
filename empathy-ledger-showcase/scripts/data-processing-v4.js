@@ -339,7 +339,8 @@ class StorytellerCentricProcessor {
         themeIds: Array.from(allThemes),
         location: primaryStoryteller?.location || 'Unknown',
         featured: fields.Featured || false,
-        // Add storyteller profile image for thumbnail
+        // Add story image if available, fall back to storyteller profile image
+        image: fields['Story Image']?.[0] || null,
         profileImage: primaryStoryteller?.profileImage || null,
         createdAt: fields['Created'] || new Date().toISOString()
       };
