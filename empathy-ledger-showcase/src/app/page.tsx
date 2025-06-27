@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { ArrowRight, Users, MapPin, Heart, BookOpen } from 'lucide-react'
 import MetricsCounter from '@/components/common/MetricsCounter'
 import FeaturedStories from '@/components/story/FeaturedStories'
-import EmpathyRipple from '@/components/visualizations/EmpathyRippleWrapper'
+import SimpleConstellation from '@/components/visualizations/SimpleConstellationWrapper'
 import PrivacyNotice from '@/components/privacy/PrivacyNotice'
 
 import { promises as fs } from 'fs'
@@ -12,13 +12,15 @@ async function getStaticData() {
   try {
     const analyticsPath = path.join(process.cwd(), 'public/data/analytics.json')
     const storiesPath = path.join(process.cwd(), 'public/data/stories.json')
+    const storytellersPath = path.join(process.cwd(), 'public/data/storytellers.json')
     
-    const [analyticsData, storiesData] = await Promise.all([
+    const [analyticsData, storiesData, storytellersData] = await Promise.all([
       fs.readFile(analyticsPath, 'utf8').then(data => JSON.parse(data)),
-      fs.readFile(storiesPath, 'utf8').then(data => JSON.parse(data))
+      fs.readFile(storiesPath, 'utf8').then(data => JSON.parse(data)),
+      fs.readFile(storytellersPath, 'utf8').then(data => JSON.parse(data))
     ])
     
-    return { analyticsData, storiesData }
+    return { analyticsData, storiesData, storytellersData }
   } catch (error) {
     console.error('Error loading data:', error)
     // Return mock data as fallback
@@ -39,13 +41,14 @@ async function getStaticData() {
           'Cairns': 3
         }
       },
-      storiesData: []
+      storiesData: [],
+      storytellersData: []
     }
   }
 }
 
 export default async function HomePage() {
-  const { analyticsData, storiesData } = await getStaticData()
+  const { analyticsData, storiesData, storytellersData } = await getStaticData()
   
   // Process themes for visualization
   const topThemes = analyticsData.themes?.topByStorytellers?.slice(0, 12).map((theme: any) => ({
@@ -124,6 +127,37 @@ export default async function HomePage() {
     .filter((story: any) => story.featured || story.hasVideo)
     .slice(0, 3)
 
+  // Process storytellers from storytellers data with theme names
+  const storytellerMap = new Map()
+  
+  // First create map from storyteller data
+  ;(storytellersData as any[]).forEach((storyteller: any) => {
+    storytellerMap.set(storyteller.id, {
+      id: storyteller.id,
+      name: storyteller.name,
+      role: storyteller.role === 'volunteer' ? 'volunteer' : 
+            storyteller.role === 'service provider' ? 'service-provider' : 'friend',
+      themes: [],
+      location: storyteller.location || 'Unknown'
+    })
+  })
+  
+  // Then add theme names from stories
+  ;(storiesData as any[]).forEach((story: any) => {
+    if (story.storytellerIds && story.storytellerIds.length > 0) {
+      story.storytellerIds.forEach((id: string) => {
+        if (storytellerMap.has(id) && story.themeNames) {
+          const existing = storytellerMap.get(id)
+          const mergedThemes = Array.from(new Set([...existing.themes, ...story.themeNames]))
+          storytellerMap.set(id, { ...existing, themes: mergedThemes })
+        }
+      })
+    }
+  })
+  
+  const processedStorytellers = Array.from(storytellerMap.values())
+    .filter(storyteller => storyteller.themes.length > 0)
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -196,7 +230,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Empathy Ripple Visualization Section */}
+      {/* Story Constellation Visualization Section */}
       <section className="relative py-0 bg-gradient-to-b from-gray-50 via-gray-900 to-gray-900 overflow-hidden">
         {/* Full-screen visualization container */}
         <div className="relative h-screen">
@@ -204,30 +238,20 @@ export default async function HomePage() {
           <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
             <div className="text-center max-w-4xl mx-auto px-6">
               <h2 className="text-5xl font-bold text-white mb-6 drop-shadow-lg animate-fade-in">
-                Every Story Creates Ripples of Change
+                Stories Connect Us Like Stars in the Sky
               </h2>
               <p className="text-xl text-white/80 max-w-2xl mx-auto leading-relaxed drop-shadow animate-fade-in animation-delay-200">
-                Watch how individual stories of connection, support, and dignity spread outward, 
-                touching lives and creating waves of positive impact throughout the community.
+                Explore how themes weave through our community, connecting volunteers, friends, and service providers 
+                in a constellation of shared experiences and human dignity.
               </p>
             </div>
           </div>
           
-          {/* The stunning visualization */}
+          {/* The constellation visualization */}
           <div className="absolute inset-0">
-            <EmpathyRipple
-              stories={featuredStories.map(story => ({
-                id: story.id,
-                title: story.title || (story.storytellerNames?.[0] ? `${story.storytellerNames[0]}'s Story` : 'A Story'),
-                theme: story.themeIds?.[0] || 'Connection',
-                color: '#f97316',
-                x: Math.random(),
-                y: Math.random()
-              }))}
+            <SimpleConstellation
+              storytellers={processedStorytellers}
               className="w-full h-full"
-              quality="high"
-              interactive={true}
-              showTutorial={true}
             />
           </div>
           
