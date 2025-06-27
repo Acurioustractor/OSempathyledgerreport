@@ -1,13 +1,21 @@
+'use client'
+
 import Link from 'next/link'
 import Image from 'next/image'
 import { Calendar, MapPin, Tag, Video, FileText, Users } from 'lucide-react'
 import { Story } from '@/types'
+import { useState } from 'react'
 
 interface FeaturedStoriesProps {
   stories: Story[]
 }
 
+interface ImageErrorState {
+  [key: string]: boolean
+}
+
 const FeaturedStories = ({ stories }: FeaturedStoriesProps) => {
+  const [imageErrors, setImageErrors] = useState<ImageErrorState>({})
   if (!stories || stories.length === 0) {
     return (
       <div className="text-center py-12">
@@ -25,13 +33,16 @@ const FeaturedStories = ({ stories }: FeaturedStoriesProps) => {
           style={{ animationDelay: `${index * 0.1}s` }}
         >
           {/* Story Image or Video Preview */}
-          {(story.image?.url || story.profileImage) ? (
+          {(story.image?.url || story.profileImage) && !imageErrors[story.id] ? (
             <div className="relative h-48 w-full">
               <Image
                 src={story.image?.url || story.profileImage || ''}
                 alt={story.title}
                 fill
                 className="object-cover"
+                onError={() => {
+                  setImageErrors(prev => ({ ...prev, [story.id]: true }))
+                }}
               />
               {story.hasVideo && (
                 <div className="absolute top-4 right-4">

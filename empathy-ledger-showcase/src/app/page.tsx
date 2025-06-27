@@ -210,11 +210,11 @@ export default async function HomePage() {
       </section>
 
       {/* Story Constellation Visualization Section */}
-      <section className="relative py-0 bg-gradient-to-b from-gray-50 via-gray-900 to-gray-900 overflow-hidden">
+      <section className="relative py-0 bg-gradient-to-b from-gray-50 via-gray-900 to-gray-900 overflow-hidden z-0">
         {/* Full-screen visualization container */}
         <div className="relative h-screen">
           {/* Content overlay */}
-          <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
+          <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
             <div className="text-center max-w-4xl mx-auto px-6">
               <h2 className="text-5xl font-bold text-white mb-6 drop-shadow-lg animate-fade-in">
                 Stories Connect Us Like Stars in the Sky
@@ -227,7 +227,7 @@ export default async function HomePage() {
           </div>
           
           {/* The constellation visualization */}
-          <div className="absolute inset-0">
+          <div className="absolute inset-0 z-10">
             <DynamicConstellation
               storytellers={processedStorytellers}
               className="w-full h-full"
@@ -235,7 +235,7 @@ export default async function HomePage() {
           </div>
           
           {/* Scroll indicator */}
-          <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20 animate-bounce">
+          <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-30 animate-bounce">
             <div className="text-white/60 text-sm">
               <p className="mb-2">Scroll to continue</p>
               <svg className="w-6 h-6 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">

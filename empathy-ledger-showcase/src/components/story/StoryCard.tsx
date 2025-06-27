@@ -1,3 +1,5 @@
+'use client'
+
 import Link from 'next/link'
 import Image from 'next/image'
 import { Calendar, Users, Video, FileText } from 'lucide-react'

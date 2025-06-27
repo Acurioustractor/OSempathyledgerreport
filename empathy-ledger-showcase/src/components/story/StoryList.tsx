@@ -1,26 +1,31 @@
+'use client'
+
 import Link from 'next/link'
 import Image from 'next/image'
 import { Calendar, Users, Video, FileText } from 'lucide-react'
 import { Story } from '@/types'
+import { useState } from 'react'
 
 interface StoryListProps {
   story: Story
 }
 
 export default function StoryList({ story }: StoryListProps) {
+  const [imageError, setImageError] = useState(false)
   return (
     <Link href={`/stories/${story.id}`}>
       <article className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 p-6">
         <div className="flex gap-6">
           {/* Thumbnail */}
           <div className="flex-shrink-0">
-            {story.image ? (
+            {story.image && !imageError ? (
               <div className="relative w-32 h-32 rounded-lg overflow-hidden">
                 <Image
                   src={story.image.thumbnails?.small?.url || story.image.url}
                   alt={story.title}
                   fill
                   className="object-cover"
+                  onError={() => setImageError(true)}
                 />
                 {story.hasVideo && (
                   <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30">

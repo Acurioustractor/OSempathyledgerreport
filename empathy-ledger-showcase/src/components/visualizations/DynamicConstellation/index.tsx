@@ -78,22 +78,25 @@ export function DynamicConstellation({ storytellers = [], className = '' }: Dyna
       })
     })
 
-    // Create theme positions in a circle
+    // Create theme positions in a spiral pattern to fit more themes
     const themeArray = Array.from(themeMap.entries())
       .sort((a, b) => b[1].count - a[1].count)
-      .slice(0, 20) // Top 20 themes
 
     const centerX = 400
     const centerY = 300
-    const radius = 250
-
+    
+    // Spiral layout for themes
     const processedThemes = themeArray.map(([ name, data ], i) => {
-      const angle = (i / themeArray.length) * Math.PI * 2
+      const spiralRadius = 100 + (i * 15)
+      const angle = (i * 0.5) // More spread out spiral
+      const x = centerX + Math.cos(angle) * spiralRadius
+      const y = centerY + Math.sin(angle) * spiralRadius
+      
       return {
         id: name.toLowerCase().replace(/\s+/g, '-'),
         name,
-        x: centerX + Math.cos(angle) * radius,
-        y: centerY + Math.sin(angle) * radius,
+        x: Math.max(50, Math.min(750, x)), // Keep within bounds
+        y: Math.max(50, Math.min(550, y)),
         count: data.count,
         color: THEME_COLORS[i % THEME_COLORS.length]
       }
@@ -308,15 +311,31 @@ export function DynamicConstellation({ storytellers = [], className = '' }: Dyna
         const x = hoveredNode.x * scaleX
         const y = hoveredNode.y * scaleY
         
+        // Calculate box dimensions based on content
+        ctx.font = 'bold 14px Arial'
+        const roleText = hoveredNode.role === 'service-provider' ? 'Service Provider' : 
+                         hoveredNode.role.charAt(0).toUpperCase() + hoveredNode.role.slice(1)
+        const roleWidth = ctx.measureText(roleText).width
+        
+        ctx.font = '11px Arial'
+        const themes = hoveredNode.themes.slice(0, 2)
+        const maxThemeWidth = Math.max(...themes.map(t => ctx.measureText(t).width))
+        
+        const padding = 15
+        const boxWidth = Math.max(roleWidth, maxThemeWidth) + padding * 2
+        const lineHeight = 18
+        const boxHeight = padding * 2 + lineHeight * (1 + Math.min(themes.length, 2) + (hoveredNode.themes.length > 2 ? 1 : 0))
+        
+        // Position box above node
+        const boxX = x - boxWidth / 2
+        const boxY = y - boxHeight - 30
+        
         // Background
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.8)'
+        ctx.fillStyle = 'rgba(10, 10, 10, 0.9)'
         ctx.strokeStyle = ROLE_COLORS[hoveredNode.role]
         ctx.lineWidth = 2
-        const padding = 10
-        const boxWidth = 200
-        const boxHeight = 60
         ctx.beginPath()
-        ctx.roundRect(x - boxWidth/2, y - boxHeight - 20, boxWidth, boxHeight, 5)
+        ctx.roundRect(boxX, boxY, boxWidth, boxHeight, 8)
         ctx.fill()
         ctx.stroke()
 
@@ -324,16 +343,17 @@ export function DynamicConstellation({ storytellers = [], className = '' }: Dyna
         ctx.fillStyle = 'white'
         ctx.font = 'bold 14px Arial'
         ctx.textAlign = 'center'
-        const roleText = hoveredNode.role === 'service-provider' ? 'Service Provider' : 
-                         hoveredNode.role.charAt(0).toUpperCase() + hoveredNode.role.slice(1)
-        ctx.fillText(roleText, x, y - boxHeight + 5)
+        ctx.fillText(roleText, x, boxY + padding + 14)
         
         ctx.font = '11px Arial'
-        ctx.fillStyle = '#ccc'
-        const themeText = hoveredNode.themes.slice(0, 3).join(', ')
-        ctx.fillText(themeText, x, y - boxHeight + 25)
-        if (hoveredNode.themes.length > 3) {
-          ctx.fillText(`+${hoveredNode.themes.length - 3} more themes`, x, y - boxHeight + 40)
+        ctx.fillStyle = '#ddd'
+        themes.forEach((theme, i) => {
+          ctx.fillText(theme, x, boxY + padding + 14 + (i + 1) * lineHeight)
+        })
+        
+        if (hoveredNode.themes.length > 2) {
+          ctx.fillStyle = '#999'
+          ctx.fillText(`+${hoveredNode.themes.length - 2} more themes`, x, boxY + padding + 14 + 3 * lineHeight)
         }
       }
 
@@ -407,11 +427,35 @@ export function DynamicConstellation({ storytellers = [], className = '' }: Dyna
     setDraggedNode(null)
   }, [draggedNode])
 
+  // Calculate crossover metrics
+  const calculateCrossover = () => {
+    const roleThemes: Record<string, Set<string>> = {
+      volunteer: new Set(),
+      friend: new Set(),
+      'service-provider': new Set()
+    }
+    
+    nodes.forEach(node => {
+      node.themes.forEach(theme => {
+        roleThemes[node.role].add(theme)
+      })
+    })
+    
+    // Themes shared across all three roles
+    const allRolesThemes = Array.from(roleThemes.volunteer)
+      .filter(theme => roleThemes.friend.has(theme) && roleThemes['service-provider'].has(theme))
+    
+    return allRolesThemes.length
+  }
+
+  // Get unique locations count from storytellers prop
+  const uniqueLocations = new Set(storytellers.map(st => st.location).filter(Boolean)).size
+
   return (
     <div className={`relative w-full h-full ${className}`}>
       <canvas
         ref={canvasRef}
-        className="absolute inset-0 w-full h-full cursor-move"
+        className="absolute inset-0 w-full h-full cursor-move z-0"
         onMouseMove={handleMouseMove}
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
@@ -421,55 +465,51 @@ export function DynamicConstellation({ storytellers = [], className = '' }: Dyna
         }}
       />
 
-      {/* Interactive Legend */}
-      <div className="absolute top-4 left-4 bg-black/80 backdrop-blur-sm rounded-lg p-4 max-w-xs">
-        <h3 className="text-white font-bold mb-3 text-lg">Community Constellation</h3>
-        
-        {/* Roles */}
-        <div className="mb-4">
-          <h4 className="text-white/80 text-sm mb-2">Stars by Role</h4>
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: ROLE_COLORS.volunteer }}></div>
-              <span className="text-white/70 text-sm">Volunteers</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: ROLE_COLORS.friend }}></div>
-              <span className="text-white/70 text-sm">Friends</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: ROLE_COLORS['service-provider'] }}></div>
-              <span className="text-white/70 text-sm">Service Providers</span>
-            </div>
+      {/* Legend */}
+      <div className="absolute top-4 left-4 bg-black/80 backdrop-blur-sm rounded-lg p-3 z-10">
+        <h3 className="text-white font-bold mb-2">Community Constellation</h3>
+        <div className="flex gap-4 text-xs">
+          <div className="flex items-center gap-1">
+            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: ROLE_COLORS.volunteer }}></div>
+            <span className="text-white/70">Volunteers</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: ROLE_COLORS.friend }}></div>
+            <span className="text-white/70">Friends</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: ROLE_COLORS['service-provider'] }}></div>
+            <span className="text-white/70">Service Providers</span>
           </div>
         </div>
-
-        {/* Theme Filter */}
-        <div>
-          <h4 className="text-white/80 text-sm mb-2">Filter by Theme</h4>
-          <select 
-            className="w-full bg-white/10 text-white text-sm rounded px-2 py-1 border border-white/20"
-            value={selectedTheme || ''}
-            onChange={(e) => setSelectedTheme(e.target.value || null)}
-          >
-            <option value="">All Themes</option>
-            {themes.map(theme => (
-              <option key={theme.id} value={theme.name}>
-                {theme.name} ({theme.count})
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <p className="text-white/50 text-xs mt-3">
-          Drag stars to explore • Lines show shared themes
-        </p>
       </div>
 
-      {/* Stats */}
-      <div className="absolute bottom-4 right-4 bg-black/80 backdrop-blur-sm rounded-lg px-4 py-2">
-        <div className="text-white/70 text-sm">
-          {nodes.length} storytellers • {themes.length} themes
+      {/* Metrics Bar */}
+      <div className="absolute bottom-0 left-0 right-0 bg-black/90 backdrop-blur-sm border-t border-white/10 z-10">
+        <div className="max-w-6xl mx-auto px-6 py-4">
+          <div className="grid grid-cols-5 gap-6 text-center">
+            <div>
+              <div className="text-2xl font-bold text-white">{nodes.length}</div>
+              <div className="text-xs text-white/60">Storytellers</div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-white">{themes.length}</div>
+              <div className="text-xs text-white/60">Unique Themes</div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-white">590</div>
+              <div className="text-xs text-white/60">Total Quotes</div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-white">{uniqueLocations}</div>
+              <div className="text-xs text-white/60">Locations</div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-white">{calculateCrossover()}</div>
+              <div className="text-xs text-white/60">Shared Themes</div>
+              <div className="text-xs text-white/40 mt-1">across all roles</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
