@@ -24,11 +24,11 @@ const FeaturedStories = ({ stories }: FeaturedStoriesProps) => {
           className="bg-white rounded-xl shadow-lg overflow-hidden card-hover animate-fade-in"
           style={{ animationDelay: `${index * 0.1}s` }}
         >
-          {/* Profile Image or Video Preview */}
-          {story.profileImage ? (
+          {/* Story Image or Video Preview */}
+          {(story.image?.url || story.profileImage) ? (
             <div className="relative h-48 w-full">
               <Image
-                src={story.profileImage}
+                src={story.image?.url || story.profileImage || ''}
                 alt={story.title}
                 fill
                 className="object-cover"

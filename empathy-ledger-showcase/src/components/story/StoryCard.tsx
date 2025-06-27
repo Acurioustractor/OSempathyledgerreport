@@ -14,10 +14,10 @@ export default function StoryCard({ story }: StoryCardProps) {
     <Link href={`/stories/${story.id}`}>
       <article className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden h-full flex flex-col">
         {/* Image or Video Thumbnail */}
-        {story.profileImage && !imageError ? (
+        {(story.image?.url || story.profileImage) && !imageError ? (
           <div className="relative h-48 w-full">
             <Image
-              src={story.profileImage}
+              src={story.image?.url || story.profileImage || ''}
               alt={story.title}
               fill
               className="object-cover"

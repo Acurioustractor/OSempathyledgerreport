@@ -215,10 +215,10 @@ export default async function WikiLandingPage() {
                 href={`/stories/${story.id}`}
                 className="group bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200 hover:shadow-lg transition-all"
               >
-                {story.profileImage && (
+                {(story.image?.url || story.profileImage) && (
                   <div className="relative h-48 overflow-hidden bg-gray-100">
                     <Image
-                      src={story.profileImage}
+                      src={story.image?.url || story.profileImage || ''}
                       alt={story.storytellerNames?.[0] || 'Storyteller'}
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-300"
