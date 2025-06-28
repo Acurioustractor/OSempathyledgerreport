@@ -13,6 +13,12 @@ const MDEditor = dynamic(
   { ssr: false }
 )
 
+// Import markdown preview separately
+const MDPreview = dynamic(
+  () => import('@uiw/react-md-editor').then(mod => mod.default.Markdown),
+  { ssr: false }
+)
+
 export default function WikiPage({ params }: { params: { slug: string } }) {
   const [isEditMode, setIsEditMode] = useState(false)
   const [content, setContent] = useState('')
@@ -189,7 +195,7 @@ More detailed information goes here.
             </div>
           ) : (
             <div className="prose prose-lg max-w-none">
-              <MDEditor.Markdown source={content} />
+              <MDPreview source={content} />
             </div>
           )}
         </div>

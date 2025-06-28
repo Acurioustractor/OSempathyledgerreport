@@ -11,6 +11,12 @@ const MDEditor = dynamic(
   { ssr: false }
 )
 
+// Import markdown preview separately
+const MDPreview = dynamic(
+  () => import('@uiw/react-md-editor').then(mod => mod.default.Markdown),
+  { ssr: false }
+)
+
 const defaultMarkdownContent = `# What is the Empathy Ledger?
 
 The Empathy Ledger is a privacy-first storytelling platform that enables organizations to collect, analyze, and share human stories with dignity and respect.
@@ -259,7 +265,7 @@ export default function WikiOverviewPage() {
             </div>
           ) : (
             <div className="prose prose-lg max-w-none">
-              <MDEditor.Markdown source={content} />
+              <MDPreview source={content} />
             </div>
           )}
         </div>

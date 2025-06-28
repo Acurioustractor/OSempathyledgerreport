@@ -11,6 +11,12 @@ const MDEditor = dynamic(
   { ssr: false }
 )
 
+// Import markdown preview separately
+const MDPreview = dynamic(
+  () => import('@uiw/react-md-editor').then(mod => mod.default.Markdown),
+  { ssr: false }
+)
+
 const defaultMarkdownContent = `# Empathy Ledger Wiki
 
 Welcome to the Empathy Ledger Wiki - your comprehensive guide to ethical storytelling and platform documentation.
@@ -207,7 +213,7 @@ export default function WikiLandingPage() {
             </div>
           ) : (
             <div className="prose prose-lg max-w-none">
-              <MDEditor.Markdown source={content} />
+              <MDPreview source={content} />
             </div>
           )}
         </div>

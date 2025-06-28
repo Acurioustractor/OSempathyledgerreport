@@ -11,6 +11,12 @@ const MDEditor = dynamic(
   { ssr: false }
 )
 
+// Import markdown preview separately
+const MDPreview = dynamic(
+  () => import('@uiw/react-md-editor').then(mod => mod.default.Markdown),
+  { ssr: false }
+)
+
 const defaultMarkdownContent = `# Wiki Content Guide
 
 > This page demonstrates all the different content types you can use in the wiki. Simply copy these examples to add your own content!
@@ -292,7 +298,7 @@ export default function ContentGuidePage() {
             </div>
           ) : (
             <div className="prose prose-lg max-w-none">
-              <MDEditor.Markdown source={content} />
+              <MDPreview source={content} />
             </div>
           )}
         </div>
