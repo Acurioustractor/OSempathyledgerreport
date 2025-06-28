@@ -356,7 +356,7 @@ export default function AdvancedInsightsPage() {
                       <button
                         key={idx}
                         onClick={() => setCustomQuery(query)}
-                        className="text-xs px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors"
+                        className="text-xs px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-900 rounded-full transition-colors"
                       >
                         {query.substring(0, 40)}...
                       </button>
