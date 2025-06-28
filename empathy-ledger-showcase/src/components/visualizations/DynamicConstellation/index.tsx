@@ -22,7 +22,7 @@ interface Theme {
   x: number
   y: number
   count: number
-  color: string
+  intensity: number
 }
 
 interface DynamicConstellationProps {
@@ -30,61 +30,68 @@ interface DynamicConstellationProps {
   className?: string
 }
 
-// Role colors - more vibrant
+// Monochrome color scheme with subtle variations
 const ROLE_COLORS = {
-  volunteer: '#FFD700', // Gold
-  friend: '#00BFFF', // Deep Sky Blue
-  'service-provider': '#32CD32' // Lime Green
+  volunteer: '#FFFFFF', // Pure white
+  friend: '#E0E0E0', // Light gray
+  'service-provider': '#C0C0C0' // Silver
+}
+
+// Role brightness levels for visual distinction
+const ROLE_BRIGHTNESS = {
+  volunteer: 1.0,
+  friend: 0.7,
+  'service-provider': 0.5
 }
 
 // Theme groups for better visualization and analysis
 const THEME_GROUPS = {
   'Volunteering & Service': {
     keywords: ['Volunteering', 'Volunteer', 'Community Service', 'Community Engagement', 'Volunteerism', 'Orange Sky'],
-    color: '#FF6347' // Orange-red
+    intensity: 0.9
   },
   'Personal Journey': {
     keywords: ['Personal Background', 'Personal', 'Introduction', 'Career', 'Transformation', 'Life'],
-    color: '#7B68EE' // Medium slate blue
+    intensity: 0.7
   },
   'Community & Connection': {
     keywords: ['Community', 'Friendship', 'Connection', 'Relationships', 'Social'],
-    color: '#32CD32' // Lime green
+    intensity: 0.8
   },
   'Social Issues': {
     keywords: ['Homelessness', 'Struggles', 'Assistance', 'Support Services', 'Crisis'],
-    color: '#FF1493' // Deep pink
+    intensity: 0.85
   },
   'Faith & Values': {
     keywords: ['Faith', 'Spirituality', 'Values', 'Compassion', 'Giving'],
-    color: '#FFD700' // Gold
+    intensity: 0.75
   },
   'Work & Retirement': {
     keywords: ['Profession', 'Work', 'Employment', 'Retirement', 'Career'],
-    color: '#00CED1' // Dark turquoise
+    intensity: 0.65
   },
   'Youth & Education': {
     keywords: ['Youth', 'Education', 'Learning', 'Development'],
-    color: '#9370DB' // Medium purple
+    intensity: 0.7
   },
   'COVID Impact': {
     keywords: ['COVID', 'Pandemic', 'Impact'],
-    color: '#DC143C' // Crimson
+    intensity: 0.8
   }
 }
 
 // Function to categorize a theme into a group
-function categorizeTheme(themeName: string): { group: string, color: string } {
+function categorizeTheme(themeName: string): { group: string, intensity: number } {
   const theme = themeName.toLowerCase()
   
   for (const [groupName, groupData] of Object.entries(THEME_GROUPS)) {
     if (groupData.keywords.some(keyword => theme.includes(keyword.toLowerCase()))) {
-      return { group: groupName, color: groupData.color }
+      return { group: groupName, intensity: groupData.intensity }
     }
   }
   
   // Default group for uncategorized themes
-  return { group: 'Other', color: '#20B2AA' } // Light sea green
+  return { group: 'Other', intensity: 0.6 }
 }
 
 // Utility: Convert hex color to rgba string
@@ -126,7 +133,7 @@ export function DynamicConstellation({ storytellers = [], className = '' }: Dyna
     
     storytellers.forEach(st => {
       st.themes?.forEach(theme => {
-        const { group, color } = categorizeTheme(theme)
+        const { group, intensity } = categorizeTheme(theme)
         
         if (!themeGroupMap.has(group)) {
           themeGroupMap.set(group, { count: 0, storytellers: new Set(), themes: new Set() })
@@ -152,7 +159,7 @@ export function DynamicConstellation({ storytellers = [], className = '' }: Dyna
       const x = centerX + Math.cos(angle) * spiralRadius
       const y = centerY + Math.sin(angle) * spiralRadius
       
-      const { color } = categorizeTheme(Array.from(data.themes)[0]) // Get color from first theme in group
+      const { intensity } = categorizeTheme(Array.from(data.themes)[0]) // Get intensity from first theme in group
       
       return {
         id: groupName.toLowerCase().replace(/\s+/g, '-'),
@@ -160,7 +167,7 @@ export function DynamicConstellation({ storytellers = [], className = '' }: Dyna
         x: Math.max(80, Math.min(720, x)), // Keep within bounds with more margin
         y: Math.max(80, Math.min(520, y)),
         count: data.count,
-        color: color,
+        intensity: intensity,
         themeCount: data.themes.size
       }
     })
@@ -269,15 +276,32 @@ export function DynamicConstellation({ storytellers = [], className = '' }: Dyna
           fy += (300 - node.y) * 0.0001
         }
 
+        // Add gentle random drift for continuous movement
+        const drift = 0.02
+        fx += (Math.random() - 0.5) * drift
+        fy += (Math.random() - 0.5) * drift
+
         // Apply velocity
-        node.vx = (node.vx + fx) * 0.9 // Damping
-        node.vy = (node.vy + fy) * 0.9
+        node.vx = (node.vx + fx) * 0.85 // Slightly less damping for more fluid movement
+        node.vy = (node.vy + fy) * 0.85
         
         // Update position
         node.x += node.vx
         node.y += node.vy
 
-        // Bounds
+        // Bounds with soft repulsion
+        const margin = 30
+        if (node.x < margin) {
+          node.vx += (margin - node.x) * 0.02
+        } else if (node.x > 800 - margin) {
+          node.vx -= (node.x - (800 - margin)) * 0.02
+        }
+        if (node.y < margin) {
+          node.vy += (margin - node.y) * 0.02
+        } else if (node.y > 600 - margin) {
+          node.vy -= (node.y - (600 - margin)) * 0.02
+        }
+        
         node.x = Math.max(20, Math.min(780, node.x))
         node.y = Math.max(20, Math.min(580, node.y))
       }
@@ -350,11 +374,36 @@ export function DynamicConstellation({ storytellers = [], className = '' }: Dyna
         // Larger radius for more shared themes
         const radius = 30 + (roleCount * 15)
         
-        // Enhanced glow for shared themes
+        // Enhanced glow for shared themes - monochrome white
         const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius)
-        gradient.addColorStop(0, hexToRgba(theme.color, selectedIntensity))
-        gradient.addColorStop(0.5, hexToRgba(theme.color, selectedIntensity * 0.5))
-        gradient.addColorStop(1, 'transparent')
+        const glowIntensity = selectedIntensity * theme.intensity
+        
+        // Multi-layered glow for themes shared across roles
+        if (roleCount === 3) {
+          // All three roles - brightest, with rings
+          gradient.addColorStop(0, `rgba(255, 255, 255, ${glowIntensity})`)
+          gradient.addColorStop(0.3, `rgba(255, 255, 255, ${glowIntensity * 0.7})`)
+          gradient.addColorStop(0.6, `rgba(255, 255, 255, ${glowIntensity * 0.4})`)
+          gradient.addColorStop(1, 'transparent')
+          
+          // Draw outer ring
+          ctx.strokeStyle = `rgba(255, 255, 255, ${glowIntensity * 0.3})`
+          ctx.lineWidth = 2
+          ctx.beginPath()
+          ctx.arc(x, y, radius + 5, 0, Math.PI * 2)
+          ctx.stroke()
+        } else if (roleCount === 2) {
+          // Two roles - medium brightness
+          gradient.addColorStop(0, `rgba(255, 255, 255, ${glowIntensity * 0.8})`)
+          gradient.addColorStop(0.5, `rgba(255, 255, 255, ${glowIntensity * 0.4})`)
+          gradient.addColorStop(1, 'transparent')
+        } else {
+          // Single role - dimmer
+          gradient.addColorStop(0, `rgba(255, 255, 255, ${glowIntensity * 0.5})`)
+          gradient.addColorStop(0.6, `rgba(255, 255, 255, ${glowIntensity * 0.2})`)
+          gradient.addColorStop(1, 'transparent')
+        }
+        
         ctx.fillStyle = gradient
         ctx.beginPath()
         ctx.arc(x, y, radius, 0, Math.PI * 2)
@@ -362,10 +411,11 @@ export function DynamicConstellation({ storytellers = [], className = '' }: Dyna
         
         // Add pulse effect for highly shared themes
         if (roleCount >= 2) {
-          const pulseRadius = radius + Math.sin(Date.now() * 0.003) * 10
+          const pulsePhase = Date.now() * 0.002 + (theme.x + theme.y) * 0.01 // Offset phase by position
+          const pulseRadius = radius + Math.sin(pulsePhase) * (roleCount * 5)
           const pulseGradient = ctx.createRadialGradient(x, y, radius * 0.8, x, y, pulseRadius)
           pulseGradient.addColorStop(0, 'transparent')
-          pulseGradient.addColorStop(1, hexToRgba(theme.color, 0.125)) // 0.125 ~ 20/255
+          pulseGradient.addColorStop(1, `rgba(255, 255, 255, ${0.05 * roleCount})`)
           ctx.fillStyle = pulseGradient
           ctx.beginPath()
           ctx.arc(x, y, pulseRadius, 0, Math.PI * 2)
@@ -384,26 +434,38 @@ export function DynamicConstellation({ storytellers = [], className = '' }: Dyna
           const sharedGroups = nodeGroups.filter(group => otherGroups.includes(group))
           
           if (sharedGroups.length > 0) {
-            // Use the color of the most prominent shared group
-            const primaryGroup = sharedGroups[0]
-            const groupColor = categorizeTheme(node.themes.find(t => categorizeTheme(t).group === primaryGroup) || '').color
-            
+            // Different visual styles for cross-role connections
+            const isCrossRole = node.role !== other.role
             const opacity = selectedTheme 
-              ? (sharedGroups.includes(selectedTheme) ? 0.8 : 0.1)
-              : Math.min(0.3 * sharedGroups.length, 0.7)
+              ? (sharedGroups.includes(selectedTheme) ? 0.6 : 0.05)
+              : Math.min(0.15 * sharedGroups.length, 0.4)
             
-            // Convert hex color to RGB for opacity
-            const hex = groupColor.replace('#', '')
-            const r = parseInt(hex.substr(0, 2), 16)
-            const g = parseInt(hex.substr(2, 2), 16)
-            const b = parseInt(hex.substr(4, 2), 16)
+            // Cross-role connections are more prominent
+            if (isCrossRole) {
+              // Draw a subtle glow line for cross-role connections
+              const glowGradient = ctx.createLinearGradient(
+                node.x * scaleX, node.y * scaleY,
+                other.x * scaleX, other.y * scaleY
+              )
+              glowGradient.addColorStop(0, `rgba(255, 255, 255, ${opacity * 0.3})`)
+              glowGradient.addColorStop(0.5, `rgba(255, 255, 255, ${opacity * 0.5})`)
+              glowGradient.addColorStop(1, `rgba(255, 255, 255, ${opacity * 0.3})`)
+              
+              ctx.strokeStyle = glowGradient
+              ctx.lineWidth = Math.min(sharedGroups.length * 1.5, 4)
+              ctx.setLineDash([5, 5]) // Dashed line for cross-role
+            } else {
+              // Same-role connections are simpler
+              ctx.strokeStyle = `rgba(255, 255, 255, ${opacity * 0.7})`
+              ctx.lineWidth = Math.min(sharedGroups.length * 0.8, 2)
+              ctx.setLineDash([]) // Solid line for same-role
+            }
             
-            ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${opacity})`
-            ctx.lineWidth = Math.min(sharedGroups.length * 1.5, 4)
             ctx.beginPath()
             ctx.moveTo(node.x * scaleX, node.y * scaleY)
             ctx.lineTo(other.x * scaleX, other.y * scaleY)
             ctx.stroke()
+            ctx.setLineDash([]) // Reset
           }
         })
       })
@@ -428,13 +490,14 @@ export function DynamicConstellation({ storytellers = [], className = '' }: Dyna
         const connectionIntensity = Math.min(connectionCount * 0.1, 0.8)
         const glowSize = size * (3 + connectionIntensity * 2)
         
-        // Star glow
+        // Star glow - monochrome with role-based brightness
         const gradient = ctx.createRadialGradient(x, y, 0, x, y, glowSize)
-        const color = ROLE_COLORS[node.role]
-        const baseOpacity = isHighlighted ? 0.5 : 0.25 // 0.5 ~ 80/255, 0.25 ~ 40/255
-        const glowOpacity = isHighlighted ? (0.8 + connectionIntensity * 0.4) : 0.125 // 0.125 ~ 20/255
-        gradient.addColorStop(0, hexToRgba(color, glowOpacity))
-        gradient.addColorStop(0.4, hexToRgba(color, baseOpacity))
+        const roleBrightness = ROLE_BRIGHTNESS[node.role]
+        const baseOpacity = isHighlighted ? 0.6 * roleBrightness : 0.2 * roleBrightness
+        const glowOpacity = isHighlighted ? (0.8 + connectionIntensity * 0.3) * roleBrightness : 0.15 * roleBrightness
+        
+        gradient.addColorStop(0, `rgba(255, 255, 255, ${glowOpacity})`)
+        gradient.addColorStop(0.4, `rgba(255, 255, 255, ${baseOpacity})`)
         gradient.addColorStop(1, 'transparent')
         ctx.fillStyle = gradient
         ctx.beginPath()
@@ -443,14 +506,17 @@ export function DynamicConstellation({ storytellers = [], className = '' }: Dyna
 
         // Star core with connection-based sizing
         const coreSize = size + (connectionIntensity * 2)
-        ctx.fillStyle = isHighlighted ? color : hexToRgba(color, 0.375) // 0.375 ~ 60/255
+        const coreBrightness = 200 + (55 * roleBrightness) // Range from 200-255
+        ctx.fillStyle = isHighlighted ? 
+          `rgb(${coreBrightness}, ${coreBrightness}, ${coreBrightness})` : 
+          `rgba(${coreBrightness}, ${coreBrightness}, ${coreBrightness}, 0.5)`
         ctx.beginPath()
         ctx.arc(x, y, coreSize, 0, Math.PI * 2)
         ctx.fill()
         
         // Add subtle ring for highly connected nodes
         if (connectionCount > 3) {
-          ctx.strokeStyle = hexToRgba(color, 0.375) // 0.375 ~ 60/255
+          ctx.strokeStyle = `rgba(255, 255, 255, ${0.3 * roleBrightness})`
           ctx.lineWidth = 1
           ctx.beginPath()
           ctx.arc(x, y, coreSize + 3, 0, Math.PI * 2)
@@ -487,7 +553,8 @@ export function DynamicConstellation({ storytellers = [], className = '' }: Dyna
         
         // Background
         ctx.fillStyle = 'rgba(10, 10, 10, 0.9)'
-        ctx.strokeStyle = ROLE_COLORS[hoveredNode.role]
+        const hoverBrightness = ROLE_BRIGHTNESS[hoveredNode.role]
+        ctx.strokeStyle = `rgba(255, 255, 255, ${0.5 * hoverBrightness})`
         ctx.lineWidth = 2
         ctx.beginPath()
         ctx.roundRect(boxX, boxY, boxWidth, boxHeight, 8)
@@ -624,10 +691,11 @@ export function DynamicConstellation({ storytellers = [], className = '' }: Dyna
   const uniqueLocations = new Set(storytellers.map(st => st.location).filter(Boolean)).size
 
   return (
-    <div className={`relative w-full h-full ${className}`}>
+    <div className={`relative w-full h-full ${className}`} style={{ position: 'relative', zIndex: 1 }}>
       <canvas
         ref={canvasRef}
-        className="absolute inset-0 w-full h-full cursor-move z-0"
+        className="absolute inset-0 w-full h-full cursor-move"
+        style={{ zIndex: 0 }}
         onMouseMove={handleMouseMove}
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
@@ -642,15 +710,15 @@ export function DynamicConstellation({ storytellers = [], className = '' }: Dyna
         <h3 className="text-white font-bold mb-2">Community Constellation</h3>
         <div className="flex gap-4 text-xs">
           <div className="flex items-center gap-1">
-            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: ROLE_COLORS.volunteer }}></div>
+            <div className="w-2 h-2 rounded-full bg-white"></div>
             <span className="text-white/70">Volunteers</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: ROLE_COLORS.friend }}></div>
+            <div className="w-2 h-2 rounded-full bg-white/70"></div>
             <span className="text-white/70">Friends</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: ROLE_COLORS['service-provider'] }}></div>
+            <div className="w-2 h-2 rounded-full bg-white/50"></div>
             <span className="text-white/70">Service Providers</span>
           </div>
         </div>

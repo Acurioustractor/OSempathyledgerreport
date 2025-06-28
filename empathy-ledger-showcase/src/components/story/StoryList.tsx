@@ -18,10 +18,10 @@ export default function StoryList({ story }: StoryListProps) {
         <div className="flex gap-6">
           {/* Thumbnail */}
           <div className="flex-shrink-0">
-            {story.image && !imageError ? (
+            {(story.image?.url && !imageError) ? (
               <div className="relative w-32 h-32 rounded-lg overflow-hidden">
                 <Image
-                  src={story.image.thumbnails?.small?.url || story.image.url}
+                  src={story.image.url}
                   alt={story.title || 'Story image'}
                   fill
                   className="object-cover"
