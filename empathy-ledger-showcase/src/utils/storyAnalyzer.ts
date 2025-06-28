@@ -107,7 +107,7 @@ function analyzeThemes(stories: Story[]): ThemeAnalysis[] {
   
   Object.entries(themeKeywords).forEach(([theme, keywords]) => {
     const matchingStories = stories.filter(story => {
-      const text = `${story.quote} ${story.summary || ''} ${story.keyThemes?.join(' ') || ''}`.toLowerCase()
+      const text = `${story.excerpt} ${story.content || ''} ${story.themes?.join(' ') || ''} ${story.themeNames?.join(' ') || ''}`.toLowerCase()
       return keywords.some(keyword => text.includes(keyword.toLowerCase()))
     })
     
@@ -129,15 +129,15 @@ function extractQuotes(stories: Story[], storytellers: Storyteller[]): QuoteResu
   const quotes: QuoteResult[] = []
   
   stories.forEach(story => {
-    if (story.quote && story.quote.length > 50) {
-      const storyteller = storytellers.find(s => s.id === story.storytellerId)
-      const sentiment = getQuoteSentiment(story.quote)
+    if (story.excerpt && story.excerpt.length > 50) {
+      const storyteller = storytellers.find(s => story.storytellerIds?.includes(s.id))
+      const sentiment = getQuoteSentiment(story.excerpt)
       
       quotes.push({
-        quote: story.quote,
-        storyteller: storyteller?.name || 'Anonymous',
-        context: story.summary || '',
-        themes: story.keyThemes || [],
+        quote: story.excerpt,
+        storyteller: storyteller?.name || story.storytellerNames?.[0] || 'Anonymous',
+        context: story.content || story.storyCopy || '',
+        themes: story.themeNames || story.themes || [],
         sentiment
       })
     }
@@ -156,36 +156,39 @@ function extractQuotes(stories: Story[], storytellers: Storyteller[]): QuoteResu
 function analyzeDemographics(stories: Story[], storytellers: Storyteller[]): DemographicInsight[] {
   const insights: DemographicInsight[] = []
   
-  // Age groups
-  const ageGroups = {
-    'Youth (18-25)': storytellers.filter(s => {
-      if (!s.demographics?.ageRange) return false
-      const age = parseInt(s.demographics.ageRange)
-      return age >= 18 && age <= 25
-    }).length,
-    'Adults (26-50)': storytellers.filter(s => {
-      if (!s.demographics?.ageRange) return false
-      const age = parseInt(s.demographics.ageRange)
-      return age >= 26 && age <= 50
-    }).length,
-    'Seniors (50+)': storytellers.filter(s => {
-      if (!s.demographics?.ageRange) return false
-      const age = parseInt(s.demographics.ageRange)
-      return age > 50
-    }).length
+  // Role distribution
+  const roleGroups = {
+    'Friends': storytellers.filter(s => s.role === 'friend').length,
+    'Volunteers': storytellers.filter(s => s.role === 'volunteer').length
   }
   
-  Object.entries(ageGroups).forEach(([group, count]) => {
+  Object.entries(roleGroups).forEach(([group, count]) => {
     if (count > 0) {
       insights.push({
-        category: `Age: ${group}`,
+        category: `Role: ${group}`,
         insights: [`${count} storytellers`, `${Math.round((count / storytellers.length) * 100)}% of total`],
         storyCount: count
       })
     }
   })
   
-  // Add more demographic analysis here (gender, background, etc.)
+  // Location distribution
+  const locationGroups: Record<string, number> = {}
+  storytellers.forEach(s => {
+    if (s.location) {
+      locationGroups[s.location] = (locationGroups[s.location] || 0) + 1
+    }
+  })
+  
+  Object.entries(locationGroups).forEach(([location, count]) => {
+    if (count > 2) { // Only show locations with more than 2 storytellers
+      insights.push({
+        category: `Location: ${location}`,
+        insights: [`${count} storytellers`, `${Math.round((count / storytellers.length) * 100)}% of total`],
+        storyCount: count
+      })
+    }
+  })
   
   return insights
 }
@@ -215,7 +218,7 @@ function analyzeSentiment(stories: Story[]): SentimentAnalysis {
   let neutral = 0
   
   stories.forEach(story => {
-    const sentiment = getQuoteSentiment(story.quote)
+    const sentiment = getQuoteSentiment(story.excerpt)
     if (sentiment === 'positive') positive++
     else if (sentiment === 'negative') negative++
     else neutral++
@@ -235,7 +238,8 @@ function analyzeWordFrequency(stories: Story[]): WordFrequency[] {
   const stopWords = new Set(['the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'from', 'up', 'about', 'into', 'through', 'during', 'before', 'after', 'above', 'below', 'between', 'under', 'again', 'further', 'then', 'once', 'is', 'am', 'are', 'was', 'were', 'been', 'be', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must', 'can', 'this', 'that', 'these', 'those', 'i', 'you', 'he', 'she', 'it', 'we', 'they', 'them', 'their', 'what', 'which', 'who', 'when', 'where', 'why', 'how', 'all', 'each', 'every', 'some', 'any', 'few', 'more', 'most', 'other', 'such', 'only', 'own', 'same', 'so', 'than', 'too', 'very', 'just', 'me', 'my', 'myself'])
   
   stories.forEach(story => {
-    const words = story.quote.toLowerCase().split(/\W+/)
+    const text = `${story.excerpt} ${story.content || ''} ${story.storyCopy || ''}`
+    const words = text.toLowerCase().split(/\W+/)
     words.forEach(word => {
       if (word.length > 3 && !stopWords.has(word)) {
         wordCount[word] = (wordCount[word] || 0) + 1

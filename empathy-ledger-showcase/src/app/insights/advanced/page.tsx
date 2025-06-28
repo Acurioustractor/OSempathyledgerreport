@@ -136,12 +136,12 @@ export default function AdvancedInsightsPage() {
       }
       if (dateRange.start) {
         filteredStories = filteredStories.filter(s => 
-          new Date(s.recordedDate) >= new Date(dateRange.start)
+          new Date(s.createdAt) >= new Date(dateRange.start)
         )
       }
       if (dateRange.end) {
         filteredStories = filteredStories.filter(s => 
-          new Date(s.recordedDate) <= new Date(dateRange.end)
+          new Date(s.createdAt) <= new Date(dateRange.end)
         )
       }
       
