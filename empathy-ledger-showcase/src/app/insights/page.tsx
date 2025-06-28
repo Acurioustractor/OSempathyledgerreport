@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Search, FileText, Map, Users, TrendingUp, Quote, Download, Sparkles, Filter, Calendar, Heart, Home, Brain, Globe, BarChart3, MessageSquare, ArrowRight } from 'lucide-react'
-import Header from '@/components/layout/Header'
-import Footer from '@/components/layout/Footer'
+// Header and Footer are already in the root layout
 
 interface QueryTemplate {
   id: string
@@ -198,9 +197,6 @@ Consider diving deeper into specific themes or generating targeted reports.`
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
-      
-      <main className="flex-grow">
         {/* Hero Section */}
         <section className="bg-gradient-to-br from-orange-50 to-white py-12">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -226,8 +222,8 @@ Consider diving deeper into specific themes or generating targeted reports.`
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleQuerySubmit(searchQuery)}
-                  placeholder="Ask a question about the stories... e.g., 'What are the main challenges faced in regional areas?'"
-                  className="w-full px-6 py-4 pr-32 text-lg border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-sky"
+                  placeholder="Ask a question about the stories..."
+                  className="w-full px-6 py-4 pr-40 text-base border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-sky"
                 />
                 <button
                   onClick={() => handleQuerySubmit(searchQuery)}
@@ -344,8 +340,8 @@ Consider diving deeper into specific themes or generating targeted reports.`
                   </button>
                 </div>
                 
-                <div className="prose prose-lg max-w-none">
-                  <div dangerouslySetInnerHTML={{ __html: generatedContent.replace(/\n/g, '<br/>').replace(/#{1,3} (.*)/g, '<h3 class="text-xl font-bold mt-4 mb-2">$1</h3>').replace(/> (.*)/g, '<blockquote class="border-l-4 border-orange-sky pl-4 my-4 italic">$1</blockquote>') }} />
+                <div className="prose prose-lg max-w-none text-gray-800">
+                  <div dangerouslySetInnerHTML={{ __html: generatedContent.replace(/\n/g, '<br/>').replace(/#{1,3} (.*)/g, '<h3 class="text-xl font-bold mt-4 mb-2 text-gray-900">$1</h3>').replace(/> (.*)/g, '<blockquote class="border-l-4 border-orange-sky pl-4 my-4 italic text-gray-700">$1</blockquote>').replace(/- (.*)/g, '<li class="ml-4 text-gray-800">$1</li>') }} />
                 </div>
 
                 {/* Action Buttons */}
@@ -426,9 +422,6 @@ Consider diving deeper into specific themes or generating targeted reports.`
             </div>
           </div>
         </section>
-      </main>
-
-      <Footer />
     </div>
   )
 }

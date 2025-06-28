@@ -275,12 +275,13 @@ export default function ContentGuidePage() {
           {isEditMode ? (
             <div className="space-y-4">
               {/* Markdown Editor */}
-              <div className="border border-gray-300 rounded-lg overflow-hidden">
+              <div className="border border-gray-300 rounded-lg overflow-hidden" data-color-mode="light">
                 <MDEditor
                   value={content}
                   onChange={(val) => setContent(val || '')}
                   height={600}
                   preview="live"
+                  data-color-mode="light"
                 />
               </div>
               
@@ -297,8 +298,8 @@ export default function ContentGuidePage() {
               </div>
             </div>
           ) : (
-            <div className="prose prose-lg max-w-none">
-              <MDPreview source={content} />
+            <div className="prose prose-lg max-w-none" data-color-mode="light">
+              <MDPreview source={content} style={{ backgroundColor: 'transparent' }} />
             </div>
           )}
         </div>

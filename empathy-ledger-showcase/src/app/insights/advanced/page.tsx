@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Calendar, Users, Map, Quote, Download, Share2, Save, ChevronRight, Filter, BarChart3, PieChart, TrendingUp, FileText, Brain, Heart, Globe, Sparkles } from 'lucide-react'
-import Header from '@/components/layout/Header'
-import Footer from '@/components/layout/Footer'
+// Header and Footer are already in the root layout
 import { analyzeStories, processQuery } from '@/utils/storyAnalyzer'
 import { Story, Storyteller } from '@/types'
 
@@ -181,9 +180,6 @@ export default function AdvancedInsightsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
-      
-      <main className="flex-grow">
         {/* Hero Section */}
         <section className="bg-gradient-to-br from-orange-50 to-blue-50 py-12">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -424,15 +420,15 @@ export default function AdvancedInsightsPage() {
                   </div>
 
                   {/* Report Content */}
-                  <div className="prose prose-lg max-w-none">
+                  <div className="prose prose-lg max-w-none text-gray-800">
                     <div 
                       dangerouslySetInnerHTML={{ 
                         __html: generatedReport.content
                           .replace(/\n/g, '<br/>')
-                          .replace(/#{1,3} (.*)/g, '<h3 class="text-xl font-bold mt-6 mb-3">$1</h3>')
+                          .replace(/#{1,3} (.*)/g, '<h3 class="text-xl font-bold mt-6 mb-3 text-gray-900">$1</h3>')
                           .replace(/> (.*)/g, '<blockquote class="border-l-4 border-orange-sky pl-4 my-4 italic text-gray-700">$1</blockquote>')
-                          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                          .replace(/- (.*)/g, '<li class="ml-4">$1</li>')
+                          .replace(/\*\*(.*?)\*\*/g, '<strong class="text-gray-900">$1</strong>')
+                          .replace(/- (.*)/g, '<li class="ml-4 text-gray-800">$1</li>')
                       }} 
                     />
                   </div>
@@ -498,9 +494,6 @@ export default function AdvancedInsightsPage() {
             </div>
           </div>
         </div>
-      </main>
-
-      <Footer />
     </div>
   )
 }
