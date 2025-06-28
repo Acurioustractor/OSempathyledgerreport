@@ -691,11 +691,10 @@ export function DynamicConstellation({ storytellers = [], className = '' }: Dyna
   const uniqueLocations = new Set(storytellers.map(st => st.location).filter(Boolean)).size
 
   return (
-    <div className={`relative w-full h-full ${className}`} style={{ position: 'relative', zIndex: 1 }}>
+    <div className={`relative w-full h-full ${className}`}>
       <canvas
         ref={canvasRef}
         className="absolute inset-0 w-full h-full cursor-move"
-        style={{ zIndex: 0 }}
         onMouseMove={handleMouseMove}
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
@@ -706,7 +705,7 @@ export function DynamicConstellation({ storytellers = [], className = '' }: Dyna
       />
 
       {/* Legend */}
-      <div className="absolute top-4 left-4 bg-black/80 backdrop-blur-sm rounded-lg p-3 z-10">
+      <div className="absolute top-4 left-4 bg-black/80 backdrop-blur-sm rounded-lg p-3" style={{ pointerEvents: 'none' }}>
         <h3 className="text-white font-bold mb-2">Community Constellation</h3>
         <div className="flex gap-4 text-xs">
           <div className="flex items-center gap-1">
@@ -725,7 +724,7 @@ export function DynamicConstellation({ storytellers = [], className = '' }: Dyna
       </div>
 
       {/* Metrics Bar */}
-      <div className="absolute bottom-0 left-0 right-0 bg-black/90 backdrop-blur-sm border-t border-white/10 z-20">
+      <div className="absolute bottom-0 left-0 right-0 bg-black/90 backdrop-blur-sm border-t border-white/10" style={{ pointerEvents: 'none' }}>
         <div className="max-w-6xl mx-auto px-6 py-4">
           <div className="grid grid-cols-5 gap-6 text-center">
             <div>

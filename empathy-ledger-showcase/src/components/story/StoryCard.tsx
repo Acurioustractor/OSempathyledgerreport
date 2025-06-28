@@ -16,14 +16,17 @@ export default function StoryCard({ story }: StoryCardProps) {
     <Link href={`/stories/${story.id}`}>
       <article className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden h-full flex flex-col">
         {/* Image or Video Thumbnail */}
-        {(story.image?.url || story.profileImage) && !imageError ? (
+        {(story.image?.url && !imageError) ? (
           <div className="relative h-48 w-full">
             <Image
-              src={story.image?.url || story.profileImage || ''}
+              src={story.image.url}
               alt={story.title || 'Story image'}
               fill
               className="object-cover"
-              onError={() => setImageError(true)}
+              onError={() => {
+                console.error('Story image failed to load:', story.image?.url)
+                setImageError(true)
+              }}
               unoptimized={true}
             />
             {story.hasVideo && (

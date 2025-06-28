@@ -33,14 +33,15 @@ const FeaturedStories = ({ stories }: FeaturedStoriesProps) => {
           style={{ animationDelay: `${index * 0.1}s` }}
         >
           {/* Story Image or Video Preview */}
-          {(story.image?.url || story.profileImage) && !imageErrors[story.id] ? (
+          {(story.image?.url && !imageErrors[story.id]) ? (
             <div className="relative h-48 w-full">
               <Image
-                src={story.image?.url || story.profileImage || ''}
+                src={story.image.url}
                 alt={story.title || 'Story image'}
                 fill
                 className="object-cover"
                 onError={() => {
+                  console.error('Featured story image failed to load:', story.image?.url)
                   setImageErrors(prev => ({ ...prev, [story.id]: true }))
                 }}
                 unoptimized={true}
