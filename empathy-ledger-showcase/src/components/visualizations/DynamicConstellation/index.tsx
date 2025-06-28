@@ -87,6 +87,20 @@ function categorizeTheme(themeName: string): { group: string, color: string } {
   return { group: 'Other', color: '#20B2AA' } // Light sea green
 }
 
+// Utility: Convert hex color to rgba string
+function hexToRgba(hex: string, alpha: number): string {
+  // Remove # if present
+  hex = hex.replace('#', '')
+  // Support short hex
+  if (hex.length === 3) {
+    hex = hex.split('').map(x => x + x).join('')
+  }
+  const r = parseInt(hex.substring(0, 2), 16)
+  const g = parseInt(hex.substring(2, 4), 16)
+  const b = parseInt(hex.substring(4, 6), 16)
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`
+}
+
 export function DynamicConstellation({ storytellers = [], className = '' }: DynamicConstellationProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const animationRef = useRef<number>()
@@ -338,8 +352,8 @@ export function DynamicConstellation({ storytellers = [], className = '' }: Dyna
         
         // Enhanced glow for shared themes
         const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius)
-        gradient.addColorStop(0, theme.color + Math.floor(selectedIntensity * 255).toString(16).padStart(2, '0'))
-        gradient.addColorStop(0.5, theme.color + Math.floor(selectedIntensity * 0.5 * 255).toString(16).padStart(2, '0'))
+        gradient.addColorStop(0, hexToRgba(theme.color, selectedIntensity))
+        gradient.addColorStop(0.5, hexToRgba(theme.color, selectedIntensity * 0.5))
         gradient.addColorStop(1, 'transparent')
         ctx.fillStyle = gradient
         ctx.beginPath()
@@ -351,7 +365,7 @@ export function DynamicConstellation({ storytellers = [], className = '' }: Dyna
           const pulseRadius = radius + Math.sin(Date.now() * 0.003) * 10
           const pulseGradient = ctx.createRadialGradient(x, y, radius * 0.8, x, y, pulseRadius)
           pulseGradient.addColorStop(0, 'transparent')
-          pulseGradient.addColorStop(1, theme.color + '20')
+          pulseGradient.addColorStop(1, hexToRgba(theme.color, 0.125)) // 0.125 ~ 20/255
           ctx.fillStyle = pulseGradient
           ctx.beginPath()
           ctx.arc(x, y, pulseRadius, 0, Math.PI * 2)
@@ -417,11 +431,10 @@ export function DynamicConstellation({ storytellers = [], className = '' }: Dyna
         // Star glow
         const gradient = ctx.createRadialGradient(x, y, 0, x, y, glowSize)
         const color = ROLE_COLORS[node.role]
-        const baseOpacity = isHighlighted ? '80' : '40'
-        const glowOpacity = isHighlighted ? Math.floor((0.8 + connectionIntensity * 0.4) * 255).toString(16).padStart(2, '0') : '20'
-        
-        gradient.addColorStop(0, color + glowOpacity)
-        gradient.addColorStop(0.4, color + baseOpacity)
+        const baseOpacity = isHighlighted ? 0.5 : 0.25 // 0.5 ~ 80/255, 0.25 ~ 40/255
+        const glowOpacity = isHighlighted ? (0.8 + connectionIntensity * 0.4) : 0.125 // 0.125 ~ 20/255
+        gradient.addColorStop(0, hexToRgba(color, glowOpacity))
+        gradient.addColorStop(0.4, hexToRgba(color, baseOpacity))
         gradient.addColorStop(1, 'transparent')
         ctx.fillStyle = gradient
         ctx.beginPath()
@@ -430,14 +443,14 @@ export function DynamicConstellation({ storytellers = [], className = '' }: Dyna
 
         // Star core with connection-based sizing
         const coreSize = size + (connectionIntensity * 2)
-        ctx.fillStyle = isHighlighted ? color : color + '60'
+        ctx.fillStyle = isHighlighted ? color : hexToRgba(color, 0.375) // 0.375 ~ 60/255
         ctx.beginPath()
         ctx.arc(x, y, coreSize, 0, Math.PI * 2)
         ctx.fill()
         
         // Add subtle ring for highly connected nodes
         if (connectionCount > 3) {
-          ctx.strokeStyle = color + '60'
+          ctx.strokeStyle = hexToRgba(color, 0.375) // 0.375 ~ 60/255
           ctx.lineWidth = 1
           ctx.beginPath()
           ctx.arc(x, y, coreSize + 3, 0, Math.PI * 2)
