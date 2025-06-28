@@ -12,6 +12,10 @@ interface StorytellerCardProps {
 
 export default function StorytellerCard({ storyteller }: StorytellerCardProps) {
   const [imageError, setImageError] = useState(false)
+  
+  // Use local image first, then remote URL as fallback
+  const imageUrl = (storyteller as any).localProfileImage || storyteller.profileImage
+  
   const initials = storyteller.name
     .split(' ')
     .map(n => n[0])
@@ -27,15 +31,18 @@ export default function StorytellerCard({ storyteller }: StorytellerCardProps) {
         <div className="flex items-start gap-4">
           {/* Profile Image or Initials */}
           <div className="flex-shrink-0">
-            {storyteller.profileImage && typeof storyteller.profileImage === 'string' && !imageError ? (
+            {imageUrl && typeof imageUrl === 'string' && !imageError ? (
               <div className="relative w-16 h-16 rounded-full overflow-hidden">
                 <Image
-                  src={storyteller.profileImage}
+                  src={imageUrl}
                   alt={storyteller.name || 'Storyteller'}
                   fill
                   className="object-cover"
                   sizes="64px"
-                  onError={() => setImageError(true)}
+                  onError={() => {
+                    console.error('Storyteller image failed to load:', imageUrl)
+                    setImageError(true)
+                  }}
                   unoptimized={true}
                 />
               </div>

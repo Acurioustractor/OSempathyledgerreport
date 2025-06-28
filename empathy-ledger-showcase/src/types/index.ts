@@ -19,6 +19,8 @@ export interface Story {
     thumbnails?: any;
   };
   profileImage?: string | null;  // Storyteller profile image for thumbnail
+  localImage?: { url: string };  // Local downloaded image
+  localProfileImage?: string;  // Local downloaded profile image
   themes?: string[];  // Legacy support
   themeIds: string[];
   themeNames: string[];
@@ -46,6 +48,7 @@ export interface Storyteller {
   summary?: string;
   quotes?: string[];
   profileImage?: string;
+  localProfileImage?: string;  // Local downloaded profile image
   hasProfile?: boolean;
   storyCount?: number;
   storyIds?: string[];
@@ -75,6 +78,8 @@ export interface Media {
     url: string;
     filename: string;
   };
+  url?: string;  // Original URL for photos
+  localUrl?: string;  // Local downloaded URL
   quoteCount: number;
 }
 

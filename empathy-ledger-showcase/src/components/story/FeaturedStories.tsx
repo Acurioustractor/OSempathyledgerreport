@@ -16,6 +16,13 @@ interface ImageErrorState {
 
 const FeaturedStories = ({ stories }: FeaturedStoriesProps) => {
   const [imageErrors, setImageErrors] = useState<ImageErrorState>({})
+  
+  // Helper to get the best available image URL
+  const getImageUrl = (story: Story) => {
+    return (story as any).localImage?.url || story.image?.url || 
+           (story as any).localProfileImage || story.profileImage
+  }
+  
   if (!stories || stories.length === 0) {
     return (
       <div className="text-center py-12">
@@ -33,15 +40,15 @@ const FeaturedStories = ({ stories }: FeaturedStoriesProps) => {
           style={{ animationDelay: `${index * 0.1}s` }}
         >
           {/* Story Image or Video Preview */}
-          {(story.image?.url && !imageErrors[story.id]) ? (
+          {(getImageUrl(story) && !imageErrors[story.id]) ? (
             <div className="relative h-48 w-full">
               <Image
-                src={story.image.url}
+                src={getImageUrl(story)!}
                 alt={story.title || 'Story image'}
                 fill
                 className="object-cover"
                 onError={() => {
-                  console.error('Featured story image failed to load:', story.image?.url)
+                  console.error('Featured story image failed to load:', getImageUrl(story))
                   setImageErrors(prev => ({ ...prev, [story.id]: true }))
                 }}
                 unoptimized={true}

@@ -10,6 +10,8 @@
     "lint": "next lint",
     "fetch-data": "node scripts/fetch-and-process-data.js",
     "fetch-data-if-needed": "node scripts/fetch-data-if-needed.js",
+    "download-images": "node scripts/download-images.js",
+    "fetch-and-download": "npm run fetch-data && npm run download-images",
     "generate-photo-index": "node scripts/extract-and-preserve-metadata.js && node scripts/optimize-with-metadata-preservation.js && node scripts/generate-filters-from-real-metadata.js",
     "add-metadata": "node scripts/add-sample-metadata.js",
     "optimize-images": "node scripts/optimize-images.js",

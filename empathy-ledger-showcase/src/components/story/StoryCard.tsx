@@ -12,19 +12,24 @@ interface StoryCardProps {
 
 export default function StoryCard({ story }: StoryCardProps) {
   const [imageError, setImageError] = useState(false)
+  
+  // Use local image first, then remote URL as fallback
+  const imageUrl = (story as any).localImage?.url || story.image?.url || 
+                   (story as any).localProfileImage || story.profileImage
+  
   return (
     <Link href={`/stories/${story.id}`}>
       <article className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden h-full flex flex-col">
         {/* Image or Video Thumbnail */}
-        {(story.image?.url && !imageError) ? (
+        {(imageUrl && !imageError) ? (
           <div className="relative h-48 w-full">
             <Image
-              src={story.image.url}
+              src={imageUrl}
               alt={story.title || 'Story image'}
               fill
               className="object-cover"
               onError={() => {
-                console.error('Story image failed to load:', story.image?.url)
+                console.error('Story image failed to load:', imageUrl)
                 setImageError(true)
               }}
               unoptimized={true}

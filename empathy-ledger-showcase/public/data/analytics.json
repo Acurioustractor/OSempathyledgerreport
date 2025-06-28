@@ -9,8 +9,8 @@
   },
   "storytellers": {
     "byRole": {
-      "volunteers": 51,
-      "friends": 30,
+      "volunteers": 50,
+      "friends": 31,
       "serviceProviders": 26,
       "other": 1
     },
@@ -27,8 +27,8 @@
         "location": "Hobart",
         "count": 14,
         "roles": {
-          "volunteers": 11,
-          "friends": 2
+          "volunteers": 10,
+          "friends": 3
         }
       },
       {
@@ -314,8 +314,8 @@
   "quotes": {
     "total": 590,
     "byRole": {
-      "volunteers": 297,
-      "friends": 147
+      "volunteers": 292,
+      "friends": 152
     },
     "averageLength": 124
   }
