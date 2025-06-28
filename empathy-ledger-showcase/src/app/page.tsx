@@ -214,7 +214,7 @@ export default async function HomePage() {
         {/* Full-screen visualization container */}
         <div className="relative h-screen">
           {/* The constellation visualization - lowest layer */}
-          <div className="absolute inset-0">
+          <div className="absolute inset-0 pointer-events-none">
             <DynamicConstellation
               storytellers={processedStorytellers}
               className="w-full h-full"
