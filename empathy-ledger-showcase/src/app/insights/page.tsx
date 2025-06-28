@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Search, FileText, Map, Users, TrendingUp, Quote, Download, Sparkles, Filter, Calendar, Heart, Home, Brain, Globe, BarChart3, MessageSquare } from 'lucide-react'
+import { Search, FileText, Map, Users, TrendingUp, Quote, Download, Sparkles, Filter, Calendar, Heart, Home, Brain, Globe, BarChart3, MessageSquare, ArrowRight } from 'lucide-react'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 
