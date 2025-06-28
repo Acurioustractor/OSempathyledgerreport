@@ -68,23 +68,6 @@ a {
   transition: all 0.2s ease-in-out;
 }
 
-/* Fix z-index and pointer events issues */
-header {
-  z-index: 9999 !important;
-  position: sticky !important;
-  pointer-events: auto !important;
-}
-
-button, a, input, select, textarea {
-  position: relative;
-  z-index: 1;
-  pointer-events: auto !important;
-}
-
-canvas {
-  pointer-events: auto !important;
-}
-
 /* Focus styles for accessibility */
 button:focus,
 a:focus,

@@ -2,7 +2,6 @@ import Link from 'next/link'
 import { ArrowRight, Users, MapPin, Heart, BookOpen } from 'lucide-react'
 import MetricsCounter from '@/components/common/MetricsCounter'
 import FeaturedStories from '@/components/story/FeaturedStories'
-import DynamicConstellation from '@/components/visualizations/DynamicConstellationWrapper'
 import PrivacyNotice from '@/components/privacy/PrivacyNotice'
 
 import { promises as fs } from 'fs'
@@ -127,15 +126,6 @@ export default async function HomePage() {
     .filter((story: any) => story.featured || story.hasVideo)
     .slice(0, 3)
 
-  // Process storytellers - they already have themes!
-  const processedStorytellers = (storytellersData as any[]).map((storyteller: any) => ({
-    id: storyteller.id,
-    name: storyteller.name,
-    role: storyteller.role === 'volunteer' ? 'volunteer' : 
-          storyteller.role === 'service provider' ? 'service-provider' : 'friend',
-    themes: storyteller.themes || [],
-    location: storyteller.location || 'Unknown'
-  })).filter(storyteller => storyteller.themes.length > 0)
 
   return (
     <div className="min-h-screen">
@@ -209,38 +199,70 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Story Constellation Visualization Section */}
-      <section className="relative py-0 bg-gradient-to-b from-gray-50 via-gray-900 to-gray-900 overflow-hidden">
-        {/* Full-screen visualization container */}
-        <div className="relative h-screen">
-          {/* The constellation visualization - lowest layer */}
-          <div className="absolute inset-0 pointer-events-none">
-            <DynamicConstellation
-              storytellers={processedStorytellers}
-              className="w-full h-full"
-            />
+      {/* Connection & Impact Section */}
+      <section className="py-20 bg-gradient-to-br from-orange-50 to-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-900 mb-6">
+              Stories That Connect Us
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+              Every story shared creates a ripple of understanding. Through {analyticsData.quotes?.total || 590} recorded moments,
+              we witness the threads that bind our community together.
+            </p>
           </div>
           
-          {/* Content overlay */}
-          <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
-            <div className="text-center max-w-4xl mx-auto px-6">
-              <h2 className="text-5xl font-bold text-white mb-6 drop-shadow-lg animate-fade-in">
-                Stories Connect Us Like Stars in the Sky
-              </h2>
-              <p className="text-xl text-white/80 max-w-2xl mx-auto leading-relaxed drop-shadow animate-fade-in animation-delay-200">
-                Explore how themes weave through our community, connecting volunteers, friends, and service providers 
-                in a constellation of shared experiences and human dignity.
+          {/* Theme showcase - simple grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+            <div className="bg-white rounded-xl p-8 shadow-lg border border-gray-100">
+              <div className="text-orange-sky text-3xl font-bold mb-4">
+                {analyticsData.themes?.topByStorytellers?.[0]?.storytellerCount || 47}
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                {analyticsData.themes?.topByStorytellers?.[0]?.name || "Community Engagement"}
+              </h3>
+              <p className="text-gray-600">
+                The most shared theme across volunteers and friends, showing our common ground.
+              </p>
+            </div>
+            
+            <div className="bg-white rounded-xl p-8 shadow-lg border border-gray-100">
+              <div className="text-blue-600 text-3xl font-bold mb-4">
+                {Math.round((analyticsData.storytellers?.byRole?.volunteers / analyticsData.overview?.totalStorytellers) * 100) || 46}%
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                Volunteer Voices
+              </h3>
+              <p className="text-gray-600">
+                Nearly half our stories come from volunteers who give their time to serve.
+              </p>
+            </div>
+            
+            <div className="bg-white rounded-xl p-8 shadow-lg border border-gray-100">
+              <div className="text-green-600 text-3xl font-bold mb-4">
+                {analyticsData.storytellers?.averageThemesPerStoryteller || 4.3}
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                Themes Per Story
+              </h3>
+              <p className="text-gray-600">
+                Each storyteller touches on multiple themes, showing the richness of experience.
               </p>
             </div>
           </div>
           
-          {/* Scroll indicator */}
-          <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20 animate-bounce">
-            <div className="text-white/60 text-sm">
-              <p className="mb-2">Scroll to continue</p>
-              <svg className="w-6 h-6 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+          {/* Simple visual element - quote showcase */}
+          <div className="bg-gradient-to-r from-orange-100 to-orange-50 rounded-2xl p-12 text-center">
+            <div className="max-w-3xl mx-auto">
+              <svg className="w-12 h-12 text-orange-sky/30 mx-auto mb-6" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
               </svg>
+              <blockquote className="text-2xl font-medium text-gray-800 italic mb-4">
+                "The power of listening creates space for healing and connection."
+              </blockquote>
+              <p className="text-gray-600">
+                — From our community of {analyticsData.overview?.totalStorytellers || 108} storytellers
+              </p>
             </div>
           </div>
         </div>
