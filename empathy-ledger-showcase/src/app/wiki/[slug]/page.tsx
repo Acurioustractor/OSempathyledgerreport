@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import WikiLayout from '@/components/wiki/WikiLayout'
-import { Edit, Save, X } from 'lucide-react'
+import { wikiStructure } from '@/data/wiki-structure'
+import { notFound } from 'next/navigation'
+import { Edit, Save, X, Eye } from 'lucide-react'
 import dynamic from 'next/dynamic'
 
 // Dynamically import the markdown editor to avoid SSR issues
@@ -11,111 +13,82 @@ const MDEditor = dynamic(
   { ssr: false }
 )
 
-const defaultMarkdownContent = `# Empathy Ledger Wiki
-
-Welcome to the Empathy Ledger Wiki - your comprehensive guide to ethical storytelling and platform documentation.
-
-## 📚 Wiki Areas
-
-### [Platform Overview](/wiki/overview)
-Complete guide to the Empathy Ledger platform, including core principles, technical implementation, and ethical frameworks.
-
-**Key Topics:**
-- Core principles
-- Privacy framework  
-- Platform features
-- Technical architecture
-
-### [Content Guide](/wiki/content-guide)
-Best practices for creating, editing, and managing storyteller content with respect and dignity.
-
-**Key Topics:**
-- Story management
-- Interview techniques
-- Media guidelines
-- Ethical considerations
-
-### [Technical Docs](/docs/introduction)
-Detailed technical documentation, setup guides, and system architecture information.
-
-**Key Topics:**
-- Development guide
-- System architecture
-- Performance optimization
-- Security practices
-
-## 🌟 Featured Stories
-
-The Empathy Ledger is about real people and their stories. Here are some featured examples that demonstrate the power of ethical storytelling.
-
-## 🚀 Quick Links
-
-- **[What is the Empathy Ledger?](/wiki/overview)** - Start here if you're new
-- **[Privacy & Consent Framework](/wiki/overview#privacy-consent)** - Understanding our ethical approach
-- **[Airtable Setup Guide](/wiki/overview#airtable-setup)** - Technical implementation
-- **[Interview Process](/wiki/overview#interview-process)** - Best practices for story collection
-
-## 💡 Contributing to the Wiki
-
-This wiki uses a simple markdown-based editing system. To edit any page:
-
-1. Navigate to the page you want to edit
-2. Click the "Edit Page" button in the top-right corner
-3. Make your changes using markdown syntax
-4. Preview your changes in real-time
-5. Click "Save" to store your changes locally
-
-## 🔒 Privacy First
-
-The Empathy Ledger prioritizes storyteller privacy and dignity above all else. Every feature and process is designed with consent, control, and respect at its core.
-
-## 📞 Need Help?
-
-- Check the [Content Guide](/wiki/content-guide) for markdown syntax help
-- Review the [Platform Overview](/wiki/overview) for general questions
-- Visit the [Technical Docs](/docs/introduction) for development support
-
----
-
-*The Empathy Ledger Wiki is a living document. We encourage contributions that improve clarity, accuracy, and accessibility.*
-`;
-
-export default function WikiLandingPage() {
+export default function WikiPage({ params }: { params: { slug: string } }) {
   const [isEditMode, setIsEditMode] = useState(false)
   const [content, setContent] = useState('')
+  const [title, setTitle] = useState('')
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
+
+  // Find the page in the wiki structure
+  let pageInfo = null
+  for (const section of wikiStructure) {
+    const page = section.pages.find(p => p.slug === params.slug)
+    if (page) {
+      pageInfo = page
+      break
+    }
+  }
+
+  if (!pageInfo) {
+    notFound()
+  }
 
   // Load content on mount
   useEffect(() => {
     loadContent()
-  }, [])
+  }, [params.slug])
 
   const loadContent = async () => {
     try {
       // Try to load from localStorage first
-      const savedContent = localStorage.getItem('wiki-content-home')
+      const savedContent = localStorage.getItem(`wiki-content-${params.slug}`)
       if (savedContent) {
         const parsed = JSON.parse(savedContent)
         setContent(parsed.content)
+        setTitle(parsed.title || pageInfo?.title || '')
       } else {
-        // Use default content
-        setContent(defaultMarkdownContent)
+        // Set default content
+        setContent(getDefaultContent())
+        setTitle(pageInfo?.title || '')
       }
     } catch (error) {
       console.error('Error loading content:', error)
-      setContent(defaultMarkdownContent)
+      setContent(getDefaultContent())
+      setTitle(pageInfo?.title || '')
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const getDefaultContent = () => {
+    return `# ${pageInfo?.title}
+
+This page is about ${pageInfo?.title.toLowerCase()}.
+
+## Overview
+
+Add your content here...
+
+## Key Points
+
+- Point 1
+- Point 2
+- Point 3
+
+## Details
+
+More detailed information goes here.
+`
   }
 
   const handleSave = async () => {
     setIsSaving(true)
     try {
       // Save to localStorage
-      localStorage.setItem('wiki-content-home', JSON.stringify({
+      localStorage.setItem(`wiki-content-${params.slug}`, JSON.stringify({
         content,
+        title,
         lastUpdated: new Date().toISOString()
       }))
       
@@ -137,7 +110,7 @@ export default function WikiLandingPage() {
 
   if (isLoading) {
     return (
-      <WikiLayout currentSlug="" pageTitle="Wiki Home">
+      <WikiLayout currentSlug={params.slug} pageTitle={pageInfo?.title || ''}>
         <div className="flex items-center justify-center h-64">
           <div className="text-gray-500">Loading...</div>
         </div>
@@ -146,10 +119,10 @@ export default function WikiLandingPage() {
   }
 
   return (
-    <WikiLayout currentSlug="" pageTitle="Wiki Home">
+    <WikiLayout currentSlug={params.slug} pageTitle={title}>
       <div className="relative">
         {/* Edit/View Toggle Button */}
-        <div className="absolute top-0 right-0 flex gap-2 z-10">
+        <div className="absolute top-0 right-0 flex gap-2">
           {!isEditMode ? (
             <button
               onClick={() => setIsEditMode(true)}
@@ -183,6 +156,15 @@ export default function WikiLandingPage() {
         <div className="mt-12">
           {isEditMode ? (
             <div className="space-y-4">
+              {/* Title Editor */}
+              <input
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="w-full px-4 py-2 text-2xl font-bold border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-sky"
+                placeholder="Page Title"
+              />
+              
               {/* Markdown Editor */}
               <div className="border border-gray-300 rounded-lg overflow-hidden">
                 <MDEditor
